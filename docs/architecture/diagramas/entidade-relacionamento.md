@@ -2,7 +2,7 @@
 
 **Data:** 2026-10-09
 **Formato:** Mermaid ER
-**Status:** Proposta inicial — aguardando aprovação
+**Status:** Implementado (Fase 5)
 
 ---
 
@@ -88,28 +88,18 @@ erDiagram
         uuid id PK
         uuid doctor_id FK
         uuid patient_id FK
-        uuid specialty_id FK
-        timestamp scheduled_at
+        date scheduled_date
+        time scheduled_time
         integer duration_minutes
         string status "agendada|em_andamento|concluida|cancelada|paciente_ausente"
+        text notes "anotações clínicas do médico"
         string cancellation_reason
         uuid cancelled_by FK "user_id"
         timestamp started_at
         timestamp ended_at
         timestamp created_at
         timestamp updated_at
-    }
-
-    clinical_notes {
-        uuid id PK
-        uuid appointment_id FK
-        text subjective
-        text objective
-        text assessment
-        text plan
-        text notes
-        timestamp created_at
-        timestamp updated_at
+        timestamp deleted_at
     }
 
     audit_logs {
@@ -163,8 +153,6 @@ erDiagram
     doctors ||--o{ doctor_blocks : "bloqueia"
     doctors ||--o{ appointments : "realiza"
     patients ||--o{ appointments : "agenda"
-    specialties ||--o{ appointments : "categoriza"
-    appointments ||--o| clinical_notes : "gera"
     users ||--o{ audit_logs : "gera"
 ```
 
@@ -173,9 +161,10 @@ erDiagram
 ## Notas sobre o modelo
 
 1. **UUIDs** como chaves primárias em todas as tabelas principais (evita enumeração de IDs).
-2. **Soft delete** (`deleted_at`) em `users`, `doctors`, `patients` para preservar histórico.
-3. **Constraint única** implícita em `appointments`: combinação `(doctor_id, scheduled_at)` deve ser única para prevenir double-booking.
-4. **`clinical_notes`** separado de `appointments` para facilitar controle de acesso e imutabilidade futura.
-5. **`audit_logs`** com `jsonb` para flexibilidade nos valores capturados.
-6. **`doctor_blocks`** com `block_start`/`block_end` nulos indica bloqueio do dia inteiro.
-7. O campo `role` em `users` define o perfil de acesso (RBAC simples para MVP).
+2. **Soft delete** (`deleted_at`) em `users`, `doctors`, `patients` e `appointments` para preservar histórico.
+3. **Anti double-booking:** verificação transacional com `lockForUpdate()` em `AppointmentService::create()` — impede agendamentos simultâneos no mesmo horário para o mesmo médico.
+4. **`appointments.notes`** armazena as anotações clínicas do médico diretamente na consulta (sem tabela separada no MVP).
+5. **`appointments.scheduled_date` + `scheduled_time`** substituem `scheduled_at` para facilitar queries por data e consultas de disponibilidade.
+6. **`audit_logs`** com `jsonb` para flexibilidade nos valores capturados.
+7. **`doctor_blocks`** com `block_start`/`block_end` nulos indica bloqueio do dia inteiro.
+8. O campo `role` em `users` define o perfil de acesso (RBAC simples para MVP).

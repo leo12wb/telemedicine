@@ -1,7 +1,7 @@
 # Convenções da API — Sistema de Telemedicina
 
 **Data:** 2026-10-09
-**Status:** Proposta inicial — aguardando aprovação
+**Status:** Implementado (Fase 5)
 
 ---
 
@@ -91,7 +91,7 @@
   "message": "The given data was invalid.",
   "errors": {
     "email": ["O e-mail é obrigatório."],
-    "scheduled_at": ["O horário selecionado não está disponível."]
+    "scheduled_time": ["O horário selecionado não está disponível."]
   }
 }
 ```
@@ -116,7 +116,7 @@
 ## 7. Filtros e ordenação
 
 - Filtros via query string: `?status=agendada&doctor_id=uuid`
-- Ordenação: `?sort=scheduled_at&direction=asc`
+- Ordenação: `?sort=scheduled_date&direction=asc`
 
 ---
 
@@ -138,7 +138,8 @@
 | GET | `/api/v1/users` | Sim | admin |
 | GET | `/api/v1/users/{id}` | Sim | admin |
 | POST | `/api/v1/users` | Sim | admin |
-| PATCH | `/api/v1/users/{id}` | Sim | admin |
+| PUT | `/api/v1/users/{id}` | Sim | admin |
+| PATCH | `/api/v1/users/{id}/toggle-active` | Sim | admin |
 | DELETE | `/api/v1/users/{id}` | Sim | admin |
 
 ### Doctors
@@ -147,46 +148,47 @@
 | GET | `/api/v1/doctors` | admin, medico, paciente |
 | GET | `/api/v1/doctors/{id}` | admin, medico, paciente |
 | POST | `/api/v1/doctors` | admin |
-| PATCH | `/api/v1/doctors/{id}` | admin |
+| PUT | `/api/v1/doctors/{id}` | admin |
+| PATCH | `/api/v1/doctors/{id}/toggle-active` | admin |
 | DELETE | `/api/v1/doctors/{id}` | admin |
 
 ### Specialties
 | Método | Endpoint | Perfil |
 |---|---|---|
-| GET | `/api/v1/specialties` | todos |
+| GET | `/api/v1/specialties/active` | todos |
+| GET | `/api/v1/specialties` | admin |
 | POST | `/api/v1/specialties` | admin |
-| PATCH | `/api/v1/specialties/{id}` | admin |
+| PUT | `/api/v1/specialties/{id}` | admin |
+| PATCH | `/api/v1/specialties/{id}/toggle-active` | admin |
 | DELETE | `/api/v1/specialties/{id}` | admin |
 
 ### Availability
 | Método | Endpoint | Perfil |
 |---|---|---|
-| GET | `/api/v1/doctors/{id}/schedules` | admin, medico (próprio), paciente |
+| GET | `/api/v1/doctors/{id}/schedules` | admin, medico (próprio) |
 | POST | `/api/v1/doctors/{id}/schedules` | admin, medico (próprio) |
-| PATCH | `/api/v1/doctors/{id}/schedules/{sid}` | admin, medico (próprio) |
+| PUT | `/api/v1/doctors/{id}/schedules/{sid}` | admin, medico (próprio) |
 | DELETE | `/api/v1/doctors/{id}/schedules/{sid}` | admin, medico (próprio) |
-| GET | `/api/v1/doctors/{id}/available-slots` | paciente |
+| GET | `/api/v1/doctors/{id}/availability` | todos (query: `?date=YYYY-MM-DD`) |
+| GET | `/api/v1/doctors/{id}/blocks` | admin, medico (próprio) |
 | POST | `/api/v1/doctors/{id}/blocks` | admin, medico (próprio) |
 | DELETE | `/api/v1/doctors/{id}/blocks/{bid}` | admin, medico (próprio) |
 
 ### Appointments
 | Método | Endpoint | Perfil |
 |---|---|---|
-| GET | `/api/v1/appointments` | admin (todos), medico (seus), paciente (seus) |
-| GET | `/api/v1/appointments/{id}` | owner |
+| GET | `/api/v1/appointments` | admin (todos), medico (suas), paciente (suas) |
+| GET | `/api/v1/appointments/{id}` | admin, medico (própria), paciente (própria) |
 | POST | `/api/v1/appointments` | paciente |
-| PATCH | `/api/v1/appointments/{id}/cancel` | admin, medico (suas), paciente (prazo) |
+| PATCH | `/api/v1/appointments/{id}/cancel` | admin, medico (suas), paciente (prazo 24h) |
 | PATCH | `/api/v1/appointments/{id}/reschedule` | paciente |
-
-### Consultations
-| Método | Endpoint | Perfil |
-|---|---|---|
-| PATCH | `/api/v1/consultations/{id}/start` | medico (própria) |
-| PATCH | `/api/v1/consultations/{id}/end` | medico (própria) |
-| POST | `/api/v1/consultations/{id}/notes` | medico (própria) |
-| GET | `/api/v1/consultations/{id}/notes` | medico (própria), paciente (leitura) |
+| PATCH | `/api/v1/appointments/{id}/start` | medico (própria) — agendada → em_andamento |
+| PATCH | `/api/v1/appointments/{id}/finish` | medico (própria) — em_andamento → concluida/paciente_ausente |
+| PATCH | `/api/v1/appointments/{id}/notes` | medico (própria) — adiciona/edita anotações clínicas |
 
 ### Dashboard
-| Método | Endpoint | Perfil |
-|---|---|---|
-| GET | `/api/v1/dashboard` | todos (retorno varia por perfil) |
+| Método | Endpoint | Perfil | Retorno |
+|---|---|---|---|
+| GET | `/api/v1/dashboard` | admin | `totals`, `appointments_by_status`, `today_appointments`, `upcoming_appointments` |
+| GET | `/api/v1/dashboard` | medico | `today_appointments`, `upcoming_appointments`, `week_summary`, `absent_this_week` |
+| GET | `/api/v1/dashboard` | paciente | `upcoming_appointments`, `recent_history`, `total_concluded` |

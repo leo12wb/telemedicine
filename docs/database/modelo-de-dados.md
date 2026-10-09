@@ -1,7 +1,7 @@
 # Modelo de Dados — Sistema de Telemedicina
 
 **Data:** 2026-10-09
-**Status:** Proposta inicial — aguardando aprovação
+**Status:** Implementado (Fase 5)
 
 ---
 
@@ -139,37 +139,24 @@ Consultas agendadas.
 | `id` | uuid | PK | — |
 | `doctor_id` | uuid | FK doctors.id, NOT NULL | — |
 | `patient_id` | uuid | FK patients.id, NOT NULL | — |
-| `specialty_id` | uuid | FK specialties.id, NOT NULL | — |
-| `scheduled_at` | timestamp | NOT NULL | Data e hora da consulta |
+| `scheduled_date` | date | NOT NULL | Data da consulta |
+| `scheduled_time` | time | NOT NULL | Horário da consulta (HH:MM:SS) |
 | `duration_minutes` | smallint | NOT NULL, default 30 | — |
 | `status` | varchar(20) | NOT NULL, default 'agendada' | Ver enum AppointmentStatus |
+| `notes` | text | NULL | Anotações clínicas do médico |
 | `cancellation_reason` | text | NULL | — |
 | `cancelled_by` | uuid | FK users.id, NULL | Quem cancelou |
 | `started_at` | timestamp | NULL | Início real |
 | `ended_at` | timestamp | NULL | Fim real |
 | `created_at` | timestamp | NOT NULL | — |
 | `updated_at` | timestamp | NOT NULL | — |
+| `deleted_at` | timestamp | NULL | Soft delete |
 
-**Índices:** `doctor_id`, `patient_id`, `status`, (`doctor_id`, `scheduled_at`) UNIQUE WHERE status != 'cancelada'
+**Índices:** `doctor_id`, `patient_id`, `status`, (`doctor_id`, `scheduled_date`, `scheduled_time`)
 
-**Constraint de concorrência:** UNIQUE (`doctor_id`, `scheduled_at`) WHERE `status` NOT IN ('cancelada', 'paciente_ausente') — previne double-booking no nível do banco.
+**Constraint de concorrência:** verificação transacional em `AppointmentService::create()` com `lockForUpdate()` — impede double-booking em requisições simultâneas para o mesmo médico/horário.
 
----
-
-### `clinical_notes`
-Anotações clínicas da consulta.
-
-| Coluna | Tipo | Restrições | Descrição |
-|---|---|---|---|
-| `id` | uuid | PK | — |
-| `appointment_id` | uuid | FK appointments.id, NOT NULL, UNIQUE | 1:1 com appointment |
-| `subjective` | text | NULL | Queixa do paciente |
-| `objective` | text | NULL | Exame clínico |
-| `assessment` | text | NULL | Avaliação/diagnóstico |
-| `plan` | text | NULL | Conduta/plano |
-| `notes` | text | NULL | Observações livres |
-| `created_at` | timestamp | NOT NULL | — |
-| `updated_at` | timestamp | NOT NULL | — |
+**Enum `AppointmentStatus`:** `agendada`, `em_andamento`, `concluida`, `cancelada`, `paciente_ausente`. Estados terminais (`concluida`, `cancelada`, `paciente_ausente`) bloqueiam edições posteriores.
 
 ---
 
