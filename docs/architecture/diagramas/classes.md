@@ -2,7 +2,7 @@
 
 **Data:** 2026-10-09
 **Formato:** Mermaid
-**Status:** Proposta inicial — aguardando aprovação
+**Status:** Implementado (Fase 5)
 
 > Representa as principais classes de domínio, não todas as classes do framework.
 
@@ -21,7 +21,7 @@ classDiagram
         +datetime deleted_at
         +doctor() Doctor
         +patient() Patient
-        +hasRole(role) bool
+        +isAdmin() bool
     }
 
     class UserRole {
@@ -38,9 +38,11 @@ classDiagram
         +string crm_uf
         +string phone
         +bool is_active
+        +datetime deleted_at
         +user() User
         +specialties() Collection
         +schedules() Collection
+        +blocks() Collection
         +appointments() Collection
     }
 
@@ -50,6 +52,7 @@ classDiagram
         +string cpf
         +date birth_date
         +string health_insurance
+        +datetime deleted_at
         +user() User
         +appointments() Collection
     }
@@ -70,7 +73,6 @@ classDiagram
         +int slot_duration_minutes
         +bool is_active
         +doctor() Doctor
-        +generateSlots(date) Collection
     }
 
     class DoctorBlock {
@@ -81,26 +83,25 @@ classDiagram
         +time block_end
         +string reason
         +doctor() Doctor
-        +isFullDay() bool
     }
 
     class Appointment {
         +Uuid id
         +Uuid doctor_id
         +Uuid patient_id
-        +Uuid specialty_id
-        +datetime scheduled_at
+        +date scheduled_date
+        +time scheduled_time
         +int duration_minutes
         +AppointmentStatus status
+        +string notes
         +string cancellation_reason
+        +Uuid cancelled_by
         +datetime started_at
         +datetime ended_at
+        +datetime deleted_at
         +doctor() Doctor
         +patient() Patient
-        +specialty() Specialty
-        +clinicalNote() ClinicalNote
-        +canBeCancelled() bool
-        +canBeStarted() bool
+        +scopeActive() Builder
     }
 
     class AppointmentStatus {
@@ -110,17 +111,8 @@ classDiagram
         CONCLUIDA
         CANCELADA
         PACIENTE_AUSENTE
-    }
-
-    class ClinicalNote {
-        +Uuid id
-        +Uuid appointment_id
-        +string subjective
-        +string objective
-        +string assessment
-        +string plan
-        +string notes
-        +appointment() Appointment
+        +isTerminal() bool
+        +label() string
     }
 
     class AuditLog {
@@ -138,20 +130,30 @@ classDiagram
 
     %% Services
     class AppointmentService {
-        +schedule(patient, data) Appointment
+        +list(user, filters) Collection
+        +create(data, patient) Appointment
         +cancel(appointment, user, reason) Appointment
-        +reschedule(appointment, new_slot) Appointment
+        +reschedule(appointment, data, patient) Appointment
+        +start(appointment) Appointment
+        +finish(appointment, outcome, notes) Appointment
+        +updateNotes(appointment, notes) Appointment
     }
 
     class AvailabilityService {
-        +isSlotAvailable(doctor_id, datetime) bool
-        +getAvailableSlots(doctor_id, date) Collection
+        +getAvailableSlots(doctor, date) array
+        +listSchedules(doctor) Collection
+        +createSchedule(doctor, data) DoctorSchedule
+        +updateSchedule(schedule, data) DoctorSchedule
+        +deleteSchedule(schedule) void
+        +listBlocks(doctor, filters) Collection
+        +createBlock(doctor, data) DoctorBlock
+        +deleteBlock(block) void
     }
 
-    class ConsultationService {
-        +start(appointment, doctor) Appointment
-        +end(appointment, outcome) Appointment
-        +saveNotes(appointment, data) ClinicalNote
+    class DashboardService {
+        +adminDashboard() array
+        +doctorDashboard(user) array
+        +patientDashboard(user) array
     }
 
     class AuthService {
@@ -160,7 +162,7 @@ classDiagram
         +register(data) User
     }
 
-    %% Relacionamentos
+    %% Relacionamentos de modelo
     User "1" --> "0..1" Doctor : tem perfil
     User "1" --> "0..1" Patient : tem perfil
     User "1" *-- "1" UserRole : possui
@@ -169,14 +171,14 @@ classDiagram
     Doctor "1" --> "*" DoctorBlock : bloqueia
     Doctor "1" --> "*" Appointment : realiza
     Patient "1" --> "*" Appointment : agenda
-    Specialty "1" --> "*" Appointment : categoriza
-    Appointment "1" --> "0..1" ClinicalNote : gera
     Appointment "1" *-- "1" AppointmentStatus : tem
     User "1" --> "*" AuditLog : gera
 
+    %% Dependências de serviço
     AppointmentService ..> Appointment : cria/atualiza
-    AppointmentService ..> AvailabilityService : usa
-    ConsultationService ..> Appointment : atualiza
-    ConsultationService ..> ClinicalNote : cria
+    AppointmentService ..> AvailabilityService : verifica slots
+    DashboardService ..> Appointment : consulta
+    DashboardService ..> Doctor : consulta
+    DashboardService ..> Patient : consulta
     AuthService ..> User : autentica
 ```

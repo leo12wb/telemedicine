@@ -2,7 +2,7 @@
 
 **Data:** 2026-10-09
 **Formato:** Mermaid
-**Status:** Proposta inicial — aguardando aprovação
+**Status:** Implementado (Fase 5)
 
 ---
 

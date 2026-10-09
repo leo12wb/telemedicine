@@ -1,7 +1,7 @@
 # Visão Geral da Arquitetura — Sistema de Telemedicina
 
 **Data:** 2026-10-09
-**Status:** Proposta inicial — aguardando aprovação
+**Status:** Implementado
 
 ---
 

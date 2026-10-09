@@ -1,7 +1,7 @@
 # Requisitos Funcionais — Sistema de Telemedicina
 
 **Data:** 2026-10-09
-**Status:** Proposta inicial — aguardando aprovação
+**Status:** Implementado
 
 > Legenda de prioridade: **MVP** = versão mínima utilizável | **V2** = próximas versões | **FUTURO** = versões futuras/a validar
 

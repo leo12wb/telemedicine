@@ -2,7 +2,7 @@
 
 **Data:** 2026-10-09
 **Formato:** Mermaid
-**Status:** Proposta inicial — aguardando aprovação
+**Status:** Implementado (Fase 5)
 
 ---
 
@@ -108,54 +108,40 @@ graph LR
     end
 
     subgraph Data["Camada de Dados"]
-        REPO["Repository
-        Abstração de queries"]
         MODEL["Model
         Eloquent ORM
-        Relacionamentos"]
+        Relacionamentos / Scopes"]
     end
 
     subgraph Support["Suporte"]
         ENUM["Enum
-        Status, Perfis"]
-        DTO["DTO
-        Transferência de dados
-        (quando necessário)"]
-        EXC["Exception
-        Erros de domínio"]
-        EVENT["Event + Listener
-        Desacoplamento"]
-        JOB["Job
-        Tarefas assíncronas"]
+        AppointmentStatus, UserRole"]
         NOTIF["Notification
-        E-mails"]
+        AppointmentBooked
+        AppointmentCancelled"]
     end
 
     REQ -->|dados validados| CTRL
     CTRL -->|autoriza via| POLICY
     CTRL -->|chama| SVC
-    SVC -->|usa| REPO
-    REPO -->|consulta| MODEL
-    SVC -->|dispara| EVENT
-    EVENT -->|processa| JOB
-    JOB -->|envia| NOTIF
+    SVC -->|Eloquent direto| MODEL
+    SVC -->|dispara (queued)| NOTIF
     CTRL -->|formata via| RES
-    SVC -->|lança| EXC
 ```
 
 ---
 
 ## Organização dos módulos
 
-| Módulo | Controller | Service | Repository | Model |
-|---|---|---|---|---|
-| Auth | `AuthController` | `AuthService` | — | `User` |
-| Users | `UserController` | `UserService` | `UserRepository` | `User` |
-| Doctors | `DoctorController` | `DoctorService` | `DoctorRepository` | `Doctor`, `DoctorSpecialty` |
-| Patients | `PatientController` | `PatientService` | `PatientRepository` | `Patient` |
-| Specialties | `SpecialtyController` | `SpecialtyService` | `SpecialtyRepository` | `Specialty` |
-| Availability | `AvailabilityController` | `AvailabilityService` | `AvailabilityRepository` | `DoctorSchedule`, `DoctorBlock` |
-| Appointments | `AppointmentController` | `AppointmentService` | `AppointmentRepository` | `Appointment` |
-| Consultations | `ConsultationController` | `ConsultationService` | `ConsultationRepository` | `Appointment`, `ClinicalNote` |
-| Dashboard | `DashboardController` | `DashboardService` | — | (múltiplos) |
-| Audit | — | `AuditService` | `AuditRepository` | `AuditLog` |
+| Módulo | Controller | Service | Model(s) |
+|---|---|---|---|
+| Auth | `AuthController` | `AuthService` | `User` |
+| Users | `UserController` | `UserService` | `User` |
+| Doctors | `DoctorController` | `DoctorService` | `Doctor`, `Specialty` (pivot) |
+| Patients | `PatientController` | `PatientService` | `Patient` |
+| Specialties | `SpecialtyController` | `SpecialtyService` | `Specialty` |
+| Availability | `AvailabilityController` | `AvailabilityService` | `DoctorSchedule`, `DoctorBlock` |
+| Appointments | `AppointmentController` | `AppointmentService` | `Appointment` |
+| Dashboard | `DashboardController` | `DashboardService` | `Appointment`, `Doctor`, `Patient` |
+
+> **Nota:** O padrão Repository não foi adotado no MVP. Os Services utilizam Eloquent diretamente, o que é suficiente para a escala atual. Repositories podem ser introduzidos em futuras iterações se houver necessidade de abstração de fonte de dados.

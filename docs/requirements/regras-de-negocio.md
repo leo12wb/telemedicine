@@ -1,7 +1,7 @@
 # Regras de Negócio — Sistema de Telemedicina
 
 **Data:** 2026-10-09
-**Status:** Proposta inicial — aguardando aprovação
+**Status:** Implementado
 
 > Regras marcadas com **[PENDENTE]** precisam de confirmação antes da implementação.
 

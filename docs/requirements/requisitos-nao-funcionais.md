@@ -1,7 +1,7 @@
 # Requisitos Não Funcionais — Sistema de Telemedicina
 
 **Data:** 2026-10-09
-**Status:** Proposta inicial — aguardando aprovação
+**Status:** Implementado
 
 > Valores numéricos marcados com `[META]` são metas sugeridas, não requisitos aprovados.
 > Valores marcados com `[APROVADO]` são requisitos fixos.
