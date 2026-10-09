@@ -118,6 +118,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, defineComponent, h } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useRouter } from 'vue-router'
 import { dashboardService, type AdminDashboard, type DoctorDashboard, type PatientDashboard, type AppointmentSummary } from '@/services/dashboard'
 import { STATUS_COLORS } from '@/types/appointment'
 import type { AppointmentStatus } from '@/types/appointment'
@@ -169,31 +170,52 @@ const AppointmentList = defineComponent({
     showPatient: Boolean,
   },
   setup(props) {
+    const router = useRouter()
+
     function formatDate(d: string) {
       return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR')
     }
+
+    function handleClick(a: AppointmentSummary) {
+      if (a.status === 'agendada' || a.status === 'em_andamento') {
+        router.push({ name: 'meeting-room', params: { appointmentId: a.id } })
+      } else {
+        router.push({ name: 'appointments' })
+      }
+    }
+
     return () => {
       if (props.appointments.length === 0) {
         return h('p', { class: 'text-sm text-gray-400' }, 'Nenhuma consulta.')
       }
       return h('ul', { class: 'divide-y divide-gray-100' },
-        props.appointments.map((a) =>
-          h('li', { key: a.id, class: 'py-2 flex items-center justify-between text-sm' }, [
+        props.appointments.map((a) => {
+          const isActive = a.status === 'agendada' || a.status === 'em_andamento'
+          return h('li', {
+            key: a.id,
+            class: ['py-2 flex items-center justify-between text-sm rounded px-1 -mx-1 transition-colors',
+              isActive ? 'cursor-pointer hover:bg-blue-50' : 'cursor-pointer hover:bg-gray-50',
+            ].join(' '),
+            onClick: () => handleClick(a),
+          }, [
             h('div', [
               h('span', { class: 'font-medium text-gray-800' }, formatDate(a.scheduled_date)),
-              h('span', { class: 'ml-2 text-gray-500' }, a.scheduled_time),
+              h('span', { class: 'ml-2 text-gray-500' }, a.scheduled_time.slice(0, 5)),
               props.showDoctor && a.doctor_name
                 ? h('span', { class: 'ml-2 text-blue-600' }, a.doctor_name)
                 : null,
               props.showPatient && a.patient_name
                 ? h('span', { class: 'ml-2 text-green-600' }, a.patient_name)
                 : null,
+              isActive
+                ? h('span', { class: 'ml-2 text-xs text-indigo-500 font-medium' }, '→ Entrar')
+                : null,
             ]),
             h('span', {
               class: [STATUS_COLORS[a.status as AppointmentStatus], 'px-2 py-0.5 rounded text-xs font-medium'].join(' '),
             }, STATUS_LABELS[a.status] ?? a.status),
           ])
-        )
+        })
       )
     }
   },

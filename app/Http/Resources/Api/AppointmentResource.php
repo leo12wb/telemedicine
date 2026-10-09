@@ -12,9 +12,11 @@ class AppointmentResource extends JsonResource
         return [
             'id' => $this->id,
             'doctor' => $this->whenLoaded('doctor', fn () => [
-                'id' => $this->doctor->id,
-                'name' => $this->doctor->user->name ?? null,
-                'crm' => $this->doctor->crm,
+                'id'        => $this->doctor->id,
+                'name'      => $this->doctor->user->name ?? null,
+                'crm'       => $this->doctor->crm,
+                'crm_uf'    => $this->doctor->crm_uf,
+                'photo_url' => $this->doctor->photo_path ? \Illuminate\Support\Facades\Storage::url($this->doctor->photo_path) : null,
             ]),
             'patient' => $this->whenLoaded('patient', fn () => [
                 'id' => $this->patient->id,

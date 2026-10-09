@@ -20,7 +20,7 @@ import { appointmentService } from '@/services/appointment'
 
 const makeAppt = (overrides: Partial<Appointment> = {}): Appointment => ({
   id: 'appt-1',
-  doctor: { id: 'doc-1', name: 'Dr. Ana', crm: '12345/SP' },
+  doctor: { id: 'doc-1', name: 'Dr. Ana', crm: '12345', crm_uf: 'SP', photo_url: null },
   patient: { id: 'pat-1', name: 'João' },
   scheduled_date: '2030-06-10',
   scheduled_time: '09:00:00',

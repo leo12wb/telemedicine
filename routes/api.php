@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\AppointmentAttachmentController;
 use App\Http\Controllers\Api\AppointmentController;
+use App\Http\Controllers\Api\AppointmentMessageController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\DashboardController;
@@ -122,6 +124,12 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::patch('/{appointment}/finish', [AppointmentController::class, 'finish'])->name('finish');
             Route::patch('/{appointment}/notes', [AppointmentController::class, 'updateNotes'])->name('notes');
             Route::get('/{appointment}/meeting', [MeetingController::class, 'show'])->name('meeting');
+            Route::get('/{appointment}/messages', [AppointmentMessageController::class, 'index'])->name('messages.index');
+            Route::post('/{appointment}/messages', [AppointmentMessageController::class, 'store'])->name('messages.store');
+            Route::get('/{appointment}/attachments', [AppointmentAttachmentController::class, 'index'])->name('attachments.index');
+            Route::post('/{appointment}/attachments', [AppointmentAttachmentController::class, 'store'])->name('attachments.store');
+            Route::get('/{appointment}/attachments/{attachment}/download', [AppointmentAttachmentController::class, 'download'])->name('attachments.download');
+            Route::delete('/{appointment}/attachments/{attachment}', [AppointmentAttachmentController::class, 'destroy'])->name('attachments.destroy');
         });
 
         // ─── Configurações do sistema ────────────────────────────────────────

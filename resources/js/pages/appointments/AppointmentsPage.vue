@@ -73,6 +73,8 @@
               </span>
             </td>
             <td class="px-6 py-4 text-right text-sm space-x-2">
+              <!-- Histórico: chat + anexos -->
+              <button @click="openHistory(a)" class="text-gray-500 hover:underline">Histórico</button>
               <!-- Entrar na sala de videoconferência -->
               <button
                 v-if="a.status === 'agendada' || a.status === 'em_andamento'"
@@ -215,11 +217,92 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal: histórico (chat + anexos) -->
+    <div v-if="historyTarget" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-xl w-full max-w-lg flex flex-col" style="height: 560px;">
+        <!-- Cabeçalho -->
+        <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200">
+          <div>
+            <p class="text-sm font-semibold text-gray-900">
+              {{ historyTarget.doctor?.name ?? '—' }} · {{ formatDate(historyTarget.scheduled_date) }} {{ historyTarget.scheduled_time.slice(0,5) }}
+            </p>
+            <p class="text-xs text-gray-400">{{ historyTarget.status_label }}</p>
+          </div>
+          <button @click="historyTarget = null" class="text-gray-400 hover:text-gray-600 text-lg leading-none">✕</button>
+        </div>
+
+        <!-- Abas -->
+        <div class="flex border-b border-gray-200 shrink-0">
+          <button
+            @click="historyTab = 'chat'"
+            :class="['flex-1 py-2 text-sm font-medium', historyTab === 'chat' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700']"
+          >Chat</button>
+          <button
+            @click="historyTab = 'attachments'; loadHistoryAttachments()"
+            :class="['flex-1 py-2 text-sm font-medium', historyTab === 'attachments' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700']"
+          >Anexos</button>
+        </div>
+
+        <!-- Chat -->
+        <div v-if="historyTab === 'chat'" class="flex flex-col flex-1 overflow-hidden">
+          <div class="flex-1 overflow-y-auto p-4 space-y-2">
+            <div v-if="historyMessages.length === 0" class="text-xs text-gray-400 text-center pt-6">Nenhuma mensagem nesta consulta.</div>
+            <div
+              v-for="m in historyMessages"
+              :key="m.id"
+              :class="['max-w-[80%] rounded-lg px-3 py-2', m.user_id === authStore.user?.id ? 'ml-auto bg-blue-600 text-white' : 'bg-gray-100 text-gray-800']"
+            >
+              <p class="text-xs font-medium opacity-70 mb-0.5">{{ m.user_name }}</p>
+              <p class="text-sm break-words">{{ m.body }}</p>
+              <p class="text-xs opacity-50 mt-0.5 text-right">{{ formatTime(m.created_at) }}</p>
+            </div>
+          </div>
+          <div class="p-3 border-t border-gray-100 shrink-0">
+            <div class="flex gap-2">
+              <input
+                v-model="historyNewMessage"
+                @keydown.enter.prevent="sendHistoryMessage"
+                type="text"
+                placeholder="Digite uma mensagem..."
+                class="flex-1 text-sm border border-gray-300 rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button @click="sendHistoryMessage" :disabled="!historyNewMessage.trim()" class="px-3 py-1.5 bg-blue-600 text-white rounded-md text-sm disabled:opacity-40 hover:bg-blue-700">
+                Enviar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Anexos -->
+        <div v-if="historyTab === 'attachments'" class="flex flex-col flex-1 overflow-hidden">
+          <div class="flex-1 overflow-y-auto p-4 space-y-2">
+            <div v-if="historyAttachments.length === 0" class="text-xs text-gray-400 text-center pt-6">Nenhum arquivo nesta consulta.</div>
+            <div
+              v-for="a in historyAttachments"
+              :key="a.id"
+              class="flex items-center gap-2 p-2 rounded-lg bg-gray-50 border border-gray-200"
+            >
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-gray-800 truncate">{{ a.original_name }}</p>
+                <p class="text-xs text-gray-400">{{ a.user_name }} · {{ formatSize(a.size) }}</p>
+              </div>
+              <button @click="downloadHistoryFile(a)" class="text-xs text-blue-600 hover:underline shrink-0">Baixar</button>
+            </div>
+          </div>
+          <div class="p-3 border-t border-gray-100 shrink-0">
+            <input type="file" accept=".jpg,.jpeg,.png,.pdf,.doc,.docx" @change="uploadHistoryFile" class="block w-full text-xs text-gray-500 file:mr-2 file:py-1.5 file:px-3 file:border file:rounded file:text-xs file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100" />
+            <p v-if="historyAttachError" class="mt-1 text-xs text-red-500">{{ historyAttachError }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAppointmentStore } from '@/stores/appointment'
 import { useAvailabilityStore } from '@/stores/availability'
 import { useDoctorStore } from '@/stores/doctor'
@@ -227,7 +310,9 @@ import { useAuthStore } from '@/stores/auth'
 import type { Appointment } from '@/types/appointment'
 import { STATUS_COLORS } from '@/types/appointment'
 import { appointmentService } from '@/services/appointment'
+import { appointmentChatService, type Message, type Attachment } from '@/services/appointmentChat'
 
+const router = useRouter()
 const store = useAppointmentStore()
 const availStore = useAvailabilityStore()
 const doctorStore = useDoctorStore()
@@ -260,6 +345,14 @@ const finishLoading = ref(false)
 const notesTarget = ref<Appointment | null>(null)
 const notesText = ref('')
 const notesLoading = ref(false)
+
+// ─── History modal ────────────────────────────────────────────────────────────
+const historyTarget = ref<Appointment | null>(null)
+const historyTab = ref<'chat' | 'attachments'>('chat')
+const historyMessages = ref<Message[]>([])
+const historyNewMessage = ref('')
+const historyAttachments = ref<Attachment[]>([])
+const historyAttachError = ref('')
 
 onMounted(async () => {
   await Promise.all([
@@ -341,24 +434,17 @@ async function handleCancel() {
   }
 }
 
+function goToMeeting(id: string) {
+  router.push({ name: 'meeting-room', params: { appointmentId: id } })
+}
+
 async function handleJoinMeeting(id: string) {
-  try {
-    const { url } = await appointmentService.getMeeting(id)
-    window.open(url, '_blank', 'noopener,noreferrer')
-  } catch (e: unknown) {
-    const err = e as { response?: { data?: { message?: string }; status?: number } }
-    if (err.response?.status === 404) {
-      alert('Videoconferência não disponível para esta consulta.')
-    } else if (err.response?.status === 503) {
-      alert('Serviço de videoconferência temporariamente indisponível.')
-    } else {
-      alert(err.response?.data?.message ?? 'Erro ao obter link da consulta.')
-    }
-  }
+  goToMeeting(id)
 }
 
 async function handleStart(id: string) {
   await store.startAppointment(id)
+  goToMeeting(id)
 }
 
 function openFinish(appt: Appointment) {
@@ -392,6 +478,68 @@ async function handleNotes() {
   } finally {
     notesLoading.value = false
   }
+}
+
+async function openHistory(appt: Appointment) {
+  historyTarget.value = appt
+  historyTab.value = 'chat'
+  historyMessages.value = []
+  historyAttachments.value = []
+  historyNewMessage.value = ''
+  historyAttachError.value = ''
+  historyMessages.value = await appointmentChatService.getMessages(appt.id)
+}
+
+async function sendHistoryMessage() {
+  const body = historyNewMessage.value.trim()
+  if (!body || !historyTarget.value) return
+  historyNewMessage.value = ''
+  const msg = await appointmentChatService.sendMessage(historyTarget.value.id, body)
+  historyMessages.value.push(msg)
+}
+
+async function loadHistoryAttachments() {
+  if (!historyTarget.value) return
+  historyAttachments.value = await appointmentChatService.getAttachments(historyTarget.value.id)
+}
+
+async function uploadHistoryFile(e: Event) {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file || !historyTarget.value) return
+  historyAttachError.value = ''
+  try {
+    const att = await appointmentChatService.uploadAttachment(historyTarget.value.id, file)
+    historyAttachments.value.push(att)
+  } catch {
+    historyAttachError.value = 'Erro ao enviar arquivo. Verifique o tamanho (máx. 10 MB).'
+  } finally {
+    input.value = ''
+  }
+}
+
+async function downloadHistoryFile(a: Attachment) {
+  if (!historyTarget.value) return
+  const token = localStorage.getItem('auth_token')
+  const url = appointmentChatService.downloadUrl(historyTarget.value.id, a.id)
+  const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+  if (!response.ok) return
+  const blob = await response.blob()
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = a.original_name
+  link.click()
+  URL.revokeObjectURL(link.href)
+}
+
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+}
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
 function formatDate(dateStr: string): string {

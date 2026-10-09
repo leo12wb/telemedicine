@@ -2,10 +2,13 @@
 
 namespace Database\Seeders;
 
+use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\Specialty;
+use App\Models\SystemSetting;
 use App\Models\User;
+use App\Enums\AppointmentStatus;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -57,6 +60,24 @@ class DatabaseSeeder extends Seeder
             'email' => 'paciente@telemedicina.local',
             'password' => bcrypt('password'),
         ]);
-        Patient::factory()->create(['user_id' => $devPatientUser->id]);
+        $devPatient = Patient::factory()->create(['user_id' => $devPatientUser->id]);
+
+        // ─── Consulta de demonstração ─────────────────────────────────────────
+        $devDoctor = Doctor::where('user_id', $devDoctorUser->id)->first();
+
+        Appointment::create([
+            'doctor_id'        => $devDoctor->id,
+            'patient_id'       => $devPatient->id,
+            'scheduled_date'   => now()->toDateString(),
+            'scheduled_time'   => '17:00:00',
+            'duration_minutes' => 30,
+            'status'           => AppointmentStatus::AGENDADA,
+        ]);
+
+        // ─── Configurações do sistema ─────────────────────────────────────────
+        SystemSetting::setMany([
+            'video_provider'   => 'jitsi',
+            'jitsi_server_url' => 'https://meet.jit.si',
+        ]);
     }
 }

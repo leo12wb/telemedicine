@@ -70,9 +70,9 @@ A aplicação fica disponível em `http://localhost` após subir o ambiente.
 
 | E-mail | Senha | Papel |
 |---|---|---|
-| admin@telemedicina.dev | password | Administrador |
-| medico@telemedicina.dev | password | Médico |
-| paciente@telemedicina.dev | password | Paciente |
+| admin@telemedicina.local | password | Administrador |
+| medico@telemedicina.local | password | Médico |
+| paciente@telemedicina.local | password | Paciente |
 
 ## Testes
 

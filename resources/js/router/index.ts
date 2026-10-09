@@ -23,6 +23,14 @@ const router = createRouter({
       meta: { requiresGuest: true },
     },
 
+    // ─── Sala de videoconferência (tela cheia, sem layout) ───────────────────
+    {
+      path: '/meeting/:appointmentId',
+      name: 'meeting-room',
+      component: () => import('@/pages/appointments/MeetingRoomPage.vue'),
+      meta: { requiresAuth: true },
+    },
+
     // ─── Rotas protegidas (layout compartilhado) ──────────────────────────────
     {
       path: '/',

@@ -7,7 +7,7 @@ export type AppointmentStatus =
 
 export interface Appointment {
   id: string
-  doctor: { id: string; name: string; crm: string } | null
+  doctor: { id: string; name: string; crm: string; crm_uf: string; photo_url: string | null } | null
   patient: { id: string; name: string } | null
   scheduled_date: string
   scheduled_time: string
