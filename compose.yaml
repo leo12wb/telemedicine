@@ -13,6 +13,7 @@ services:
     volumes:
       - .:/var/www/html
       - app_storage:/var/www/html/storage/app
+      - ./docker/php/php-dev.ini:/usr/local/etc/php/conf.d/app-dev.ini
     environment:
       APP_ENV: ${APP_ENV:-local}
       APP_KEY: ${APP_KEY}

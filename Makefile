@@ -3,7 +3,7 @@
 # Comandos de conveniência para o ambiente Docker
 # ─────────────────────────────────────────────────────────────
 
-.PHONY: help up down build restart logs shell migrate seed test test-backend test-frontend fresh
+.PHONY: help up down build restart logs logs-app shell migrate migrate-fresh seed dev build-fe test test-backend test-frontend test-local setup
 
 help: ## Exibe esta ajuda
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -68,4 +68,7 @@ setup: ## Configuração inicial do projeto (primeira vez)
 	docker compose up -d
 	docker compose exec app php artisan key:generate
 	docker compose exec app php artisan migrate
+	docker compose exec app php artisan storage:link
+	npm ci
+	npm run build
 	@echo "✅ Ambiente configurado! Acesse http://localhost:8080"
