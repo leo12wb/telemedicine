@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Doctor;
 
+use App\Models\Doctor;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateDoctorRequest extends FormRequest
@@ -15,18 +16,18 @@ class UpdateDoctorRequest extends FormRequest
 
     public function rules(): array
     {
-        $isAdmin   = $this->user()->isAdmin();
-        $doctorId  = $this->route('doctor')->id;
+        $isAdmin = $this->user()->isAdmin();
+        $doctorId = $this->route('doctor')->id;
 
         return [
             'phone' => ['sometimes', 'nullable', 'string', 'max:20'],
-            'bio'   => ['sometimes', 'nullable', 'string', 'max:2000'],
+            'bio' => ['sometimes', 'nullable', 'string', 'max:2000'],
             // Somente admin altera CRM, UF e especialidades
-            'crm'    => $isAdmin ? ['sometimes', 'string', 'max:20'] : ['prohibited'],
+            'crm' => $isAdmin ? ['sometimes', 'string', 'max:20'] : ['prohibited'],
             'crm_uf' => $isAdmin ? ['sometimes', 'string', 'size:2'] : ['prohibited'],
-            'specialty_ids'   => $isAdmin ? ['sometimes', 'nullable', 'array'] : ['prohibited'],
+            'specialty_ids' => $isAdmin ? ['sometimes', 'nullable', 'array'] : ['prohibited'],
             'specialty_ids.*' => ['uuid', 'exists:specialties,id'],
-            'is_active'       => $isAdmin ? ['sometimes', 'boolean'] : ['prohibited'],
+            'is_active' => $isAdmin ? ['sometimes', 'boolean'] : ['prohibited'],
         ];
     }
 
@@ -35,7 +36,7 @@ class UpdateDoctorRequest extends FormRequest
         $validator->after(function ($v) {
             if ($this->filled(['crm', 'crm_uf'])) {
                 $doctorId = $this->route('doctor')->id;
-                $exists   = \App\Models\Doctor::where('crm', $this->crm)
+                $exists = Doctor::where('crm', $this->crm)
                     ->where('crm_uf', strtoupper($this->crm_uf))
                     ->where('id', '!=', $doctorId)
                     ->exists();

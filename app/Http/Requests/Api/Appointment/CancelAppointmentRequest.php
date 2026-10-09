@@ -11,7 +11,7 @@ class CancelAppointmentRequest extends FormRequest
     {
         /** @var Appointment $appointment */
         $appointment = $this->route('appointment');
-        $user        = $this->user();
+        $user = $this->user();
 
         if ($user->isAdmin()) {
             return true;

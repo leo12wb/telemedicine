@@ -8,7 +8,7 @@ describe('POST /api/v1/auth/login', function () {
         $user = User::factory()->create(['email' => 'user@example.com']);
 
         $this->postJson('/api/v1/auth/login', [
-            'email'    => 'user@example.com',
+            'email' => 'user@example.com',
             'password' => 'password',
         ])->assertStatus(200)
             ->assertJsonStructure([
@@ -20,7 +20,7 @@ describe('POST /api/v1/auth/login', function () {
         User::factory()->create(['email' => 'user@example.com']);
 
         $this->postJson('/api/v1/auth/login', [
-            'email'    => 'user@example.com',
+            'email' => 'user@example.com',
             'password' => 'senha_errada',
         ])->assertStatus(401)
             ->assertJsonPath('message', 'Credenciais inválidas.');
@@ -28,7 +28,7 @@ describe('POST /api/v1/auth/login', function () {
 
     it('rejeita e-mail inexistente com mensagem genérica', function () {
         $this->postJson('/api/v1/auth/login', [
-            'email'    => 'naoexiste@example.com',
+            'email' => 'naoexiste@example.com',
             'password' => 'qualquer',
         ])->assertStatus(401)
             ->assertJsonPath('message', 'Credenciais inválidas.');
@@ -38,7 +38,7 @@ describe('POST /api/v1/auth/login', function () {
         User::factory()->inactive()->create(['email' => 'inativo@example.com']);
 
         $this->postJson('/api/v1/auth/login', [
-            'email'    => 'inativo@example.com',
+            'email' => 'inativo@example.com',
             'password' => 'password',
         ])->assertStatus(403)
             ->assertJsonPath('message', 'Conta desativada. Entre em contato com o suporte.');
@@ -52,7 +52,7 @@ describe('POST /api/v1/auth/login', function () {
 
     it('rejeita e-mail com formato inválido', function () {
         $this->postJson('/api/v1/auth/login', [
-            'email'    => 'nao-eh-email',
+            'email' => 'nao-eh-email',
             'password' => 'password',
         ])->assertStatus(422)
             ->assertJsonPath('errors.email.0', 'Informe um e-mail válido.');

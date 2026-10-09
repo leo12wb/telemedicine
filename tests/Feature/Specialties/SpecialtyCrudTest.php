@@ -54,7 +54,7 @@ describe('POST /api/v1/specialties', function () {
 
         $this->actingAs($admin)
             ->postJson('/api/v1/specialties', [
-                'name'        => 'Cardiologia',
+                'name' => 'Cardiologia',
                 'description' => 'Especialidade do coração.',
             ])
             ->assertStatus(201)
@@ -86,7 +86,7 @@ describe('POST /api/v1/specialties', function () {
 describe('GET /api/v1/specialties/{specialty}', function () {
 
     it('qualquer usuário autenticado visualiza uma especialidade', function () {
-        $user      = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $specialty = Specialty::factory()->create(['name' => 'Ortopedia']);
 
         $this->actingAs($user)
@@ -99,7 +99,7 @@ describe('GET /api/v1/specialties/{specialty}', function () {
 describe('PUT /api/v1/specialties/{specialty}', function () {
 
     it('admin atualiza nome e descrição', function () {
-        $admin     = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $specialty = Specialty::factory()->create(['name' => 'Antigo']);
 
         $this->actingAs($admin)
@@ -109,7 +109,7 @@ describe('PUT /api/v1/specialties/{specialty}', function () {
     });
 
     it('paciente não pode atualizar especialidades', function () {
-        $paciente  = User::factory()->paciente()->create();
+        $paciente = User::factory()->paciente()->create();
         $specialty = Specialty::factory()->create();
 
         $this->actingAs($paciente)
@@ -121,7 +121,7 @@ describe('PUT /api/v1/specialties/{specialty}', function () {
 describe('PATCH /api/v1/specialties/{specialty}/toggle-active', function () {
 
     it('admin desativa e reativa uma especialidade', function () {
-        $admin     = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $specialty = Specialty::factory()->create(['is_active' => true]);
 
         $this->actingAs($admin)
@@ -136,7 +136,7 @@ describe('PATCH /api/v1/specialties/{specialty}/toggle-active', function () {
     });
 
     it('paciente não pode alterar status de especialidade', function () {
-        $paciente  = User::factory()->paciente()->create();
+        $paciente = User::factory()->paciente()->create();
         $specialty = Specialty::factory()->create();
 
         $this->actingAs($paciente)
@@ -148,7 +148,7 @@ describe('PATCH /api/v1/specialties/{specialty}/toggle-active', function () {
 describe('DELETE /api/v1/specialties/{specialty}', function () {
 
     it('admin remove uma especialidade', function () {
-        $admin     = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $specialty = Specialty::factory()->create();
 
         $this->actingAs($admin)
@@ -160,7 +160,7 @@ describe('DELETE /api/v1/specialties/{specialty}', function () {
     });
 
     it('paciente não pode excluir especialidades', function () {
-        $paciente  = User::factory()->paciente()->create();
+        $paciente = User::factory()->paciente()->create();
         $specialty = Specialty::factory()->create();
 
         $this->actingAs($paciente)

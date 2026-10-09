@@ -17,8 +17,8 @@ class DashboardController extends Controller
         $user = $request->user();
 
         $data = match ($user->role->value) {
-            'admin'    => $this->dashboardService->adminDashboard(),
-            'medico'   => $this->dashboardService->doctorDashboard($user),
+            'admin' => $this->dashboardService->adminDashboard(),
+            'medico' => $this->dashboardService->doctorDashboard($user),
             'paciente' => $this->dashboardService->patientDashboard($user),
         };
 

@@ -15,7 +15,7 @@ class PatientService
         $query = Patient::with('user')->orderBy('created_at', 'desc');
 
         if (! empty($filters['search'])) {
-            $term = '%' . $filters['search'] . '%';
+            $term = '%'.$filters['search'].'%';
             $query->whereHas('user', fn ($q) => $q->where('name', 'like', $term)->orWhere('email', 'like', $term));
         }
 
@@ -29,20 +29,20 @@ class PatientService
     {
         return DB::transaction(function () use ($data) {
             $user = User::create([
-                'name'      => $data['name'],
-                'email'     => $data['email'],
-                'password'  => $data['password'],
-                'role'      => UserRole::PACIENTE,
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+                'role' => UserRole::PACIENTE,
                 'is_active' => true,
             ]);
 
             $patient = Patient::create([
-                'user_id'                => $user->id,
-                'cpf'                    => $data['cpf'] ?? null,
-                'birth_date'             => $data['birth_date'] ?? null,
-                'phone'                  => $data['phone'] ?? null,
-                'health_insurance'       => $data['health_insurance'] ?? null,
-                'health_insurance_number'=> $data['health_insurance_number'] ?? null,
+                'user_id' => $user->id,
+                'cpf' => $data['cpf'] ?? null,
+                'birth_date' => $data['birth_date'] ?? null,
+                'phone' => $data['phone'] ?? null,
+                'health_insurance' => $data['health_insurance'] ?? null,
+                'health_insurance_number' => $data['health_insurance_number'] ?? null,
             ]);
 
             return $patient->load('user');

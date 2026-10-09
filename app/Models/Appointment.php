@@ -31,9 +31,9 @@ class Appointment extends Model
     {
         return [
             'scheduled_date' => 'date',
-            'started_at'     => 'datetime',
-            'ended_at'       => 'datetime',
-            'status'         => AppointmentStatus::class,
+            'started_at' => 'datetime',
+            'ended_at' => 'datetime',
+            'status' => AppointmentStatus::class,
         ];
     }
 

@@ -9,15 +9,15 @@ use Carbon\Carbon;
 describe('AvailabilityService::getAvailableSlots', function () {
 
     it('gera slots corretos para um horário de 2h com duração de 30min', function () {
-        $doctor   = Doctor::factory()->create();
-        $monday   = Carbon::now()->next(Carbon::MONDAY);
+        $doctor = Doctor::factory()->create();
+        $monday = Carbon::now()->next(Carbon::MONDAY);
 
         DoctorSchedule::factory()->forDoctor($doctor)->create([
-            'day_of_week'           => 1,
-            'start_time'            => '08:00:00',
-            'end_time'              => '10:00:00',
+            'day_of_week' => 1,
+            'start_time' => '08:00:00',
+            'end_time' => '10:00:00',
             'slot_duration_minutes' => 30,
-            'is_active'             => true,
+            'is_active' => true,
         ]);
 
         $slots = app(AvailabilityService::class)->getAvailableSlots($doctor, $monday->format('Y-m-d'));
@@ -27,14 +27,14 @@ describe('AvailabilityService::getAvailableSlots', function () {
     });
 
     it('retorna vazio quando dia não tem horário cadastrado', function () {
-        $doctor  = Doctor::factory()->create();
-        $sunday  = Carbon::now()->next(Carbon::SUNDAY);
+        $doctor = Doctor::factory()->create();
+        $sunday = Carbon::now()->next(Carbon::SUNDAY);
 
         // Cadastrar horário apenas para segunda (1), buscar no domingo (0)
         DoctorSchedule::factory()->forDoctor($doctor)->create([
             'day_of_week' => 1,
-            'start_time'  => '08:00:00',
-            'end_time'    => '12:00:00',
+            'start_time' => '08:00:00',
+            'end_time' => '12:00:00',
         ]);
 
         $slots = app(AvailabilityService::class)->getAvailableSlots($doctor, $sunday->format('Y-m-d'));
@@ -44,14 +44,14 @@ describe('AvailabilityService::getAvailableSlots', function () {
 
     it('bloqueio de dia inteiro retorna vazio', function () {
         $doctor = Doctor::factory()->create();
-        $date   = Carbon::now()->next(Carbon::MONDAY);
+        $date = Carbon::now()->next(Carbon::MONDAY);
 
         DoctorSchedule::factory()->forDoctor($doctor)->create([
-            'day_of_week'           => 1,
-            'start_time'            => '08:00:00',
-            'end_time'              => '12:00:00',
+            'day_of_week' => 1,
+            'start_time' => '08:00:00',
+            'end_time' => '12:00:00',
             'slot_duration_minutes' => 30,
-            'is_active'             => true,
+            'is_active' => true,
         ]);
 
         DoctorBlock::factory()->forDoctor($doctor)->allDay()->create([
@@ -65,14 +65,14 @@ describe('AvailabilityService::getAvailableSlots', function () {
 
     it('bloqueio parcial remove apenas os slots sobrepostos', function () {
         $doctor = Doctor::factory()->create();
-        $date   = Carbon::now()->next(Carbon::MONDAY);
+        $date = Carbon::now()->next(Carbon::MONDAY);
 
         DoctorSchedule::factory()->forDoctor($doctor)->create([
-            'day_of_week'           => 1,
-            'start_time'            => '08:00:00',
-            'end_time'              => '12:00:00',
+            'day_of_week' => 1,
+            'start_time' => '08:00:00',
+            'end_time' => '12:00:00',
             'slot_duration_minutes' => 60,
-            'is_active'             => true,
+            'is_active' => true,
         ]);
 
         // Bloqueia 10:00–12:00 → remove slots 10:00 e 11:00
@@ -88,12 +88,12 @@ describe('AvailabilityService::getAvailableSlots', function () {
 
     it('horário inativo não gera slots', function () {
         $doctor = Doctor::factory()->create();
-        $date   = Carbon::now()->next(Carbon::MONDAY);
+        $date = Carbon::now()->next(Carbon::MONDAY);
 
         DoctorSchedule::factory()->forDoctor($doctor)->inactive()->create([
-            'day_of_week'           => 1,
-            'start_time'            => '08:00:00',
-            'end_time'              => '12:00:00',
+            'day_of_week' => 1,
+            'start_time' => '08:00:00',
+            'end_time' => '12:00:00',
             'slot_duration_minutes' => 30,
         ]);
 
@@ -104,24 +104,24 @@ describe('AvailabilityService::getAvailableSlots', function () {
 
     it('múltiplos horários no mesmo dia são combinados', function () {
         $doctor = Doctor::factory()->create();
-        $date   = Carbon::now()->next(Carbon::TUESDAY);
+        $date = Carbon::now()->next(Carbon::TUESDAY);
 
         // Manhã: 08:00–10:00 (2 slots de 60min)
         DoctorSchedule::factory()->forDoctor($doctor)->create([
-            'day_of_week'           => 2,
-            'start_time'            => '08:00:00',
-            'end_time'              => '10:00:00',
+            'day_of_week' => 2,
+            'start_time' => '08:00:00',
+            'end_time' => '10:00:00',
             'slot_duration_minutes' => 60,
-            'is_active'             => true,
+            'is_active' => true,
         ]);
 
         // Tarde: 14:00–16:00 (2 slots de 60min)
         DoctorSchedule::factory()->forDoctor($doctor)->create([
-            'day_of_week'           => 2,
-            'start_time'            => '14:00:00',
-            'end_time'              => '16:00:00',
+            'day_of_week' => 2,
+            'start_time' => '14:00:00',
+            'end_time' => '16:00:00',
             'slot_duration_minutes' => 60,
-            'is_active'             => true,
+            'is_active' => true,
         ]);
 
         $slots = app(AvailabilityService::class)->getAvailableSlots($doctor, $date->format('Y-m-d'));
@@ -136,9 +136,9 @@ describe('AvailabilityService::createSchedule / deleteSchedule', function () {
         $doctor = Doctor::factory()->create();
 
         $schedule = app(AvailabilityService::class)->createSchedule($doctor, [
-            'day_of_week'           => 5,
-            'start_time'            => '09:00',
-            'end_time'              => '13:00',
+            'day_of_week' => 5,
+            'start_time' => '09:00',
+            'end_time' => '13:00',
             'slot_duration_minutes' => 45,
         ]);
 
@@ -148,7 +148,7 @@ describe('AvailabilityService::createSchedule / deleteSchedule', function () {
     });
 
     it('remove um horário', function () {
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
         $schedule = DoctorSchedule::factory()->forDoctor($doctor)->create();
 
         app(AvailabilityService::class)->deleteSchedule($schedule);
@@ -164,7 +164,7 @@ describe('AvailabilityService::createBlock / deleteBlock', function () {
 
         $block = app(AvailabilityService::class)->createBlock($doctor, [
             'block_date' => '2030-07-04',
-            'reason'     => 'Feriado',
+            'reason' => 'Feriado',
         ]);
 
         expect($block->block_date->format('Y-m-d'))->toBe('2030-07-04')
@@ -173,7 +173,7 @@ describe('AvailabilityService::createBlock / deleteBlock', function () {
 
     it('remove um bloqueio', function () {
         $doctor = Doctor::factory()->create();
-        $block  = DoctorBlock::factory()->forDoctor($doctor)->create();
+        $block = DoctorBlock::factory()->forDoctor($doctor)->create();
 
         app(AvailabilityService::class)->deleteBlock($block);
 

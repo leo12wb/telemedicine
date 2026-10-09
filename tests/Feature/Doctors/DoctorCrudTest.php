@@ -30,9 +30,9 @@ describe('GET /api/v1/doctors', function () {
     });
 
     it('filtra médicos por especialidade', function () {
-        $admin     = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $specialty = Specialty::factory()->create();
-        $doctor    = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
         $doctor->specialties()->attach($specialty);
         Doctor::factory()->count(2)->create(); // sem especialidade
 
@@ -50,16 +50,16 @@ describe('GET /api/v1/doctors', function () {
 describe('POST /api/v1/doctors', function () {
 
     it('admin cria médico com user e especialidades', function () {
-        $admin     = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $specialty = Specialty::factory()->create();
 
         $this->actingAs($admin)
             ->postJson('/api/v1/doctors', [
-                'name'          => 'Dr. Pedro',
-                'email'         => 'pedro@example.com',
-                'password'      => 'Senha@1234',
-                'crm'           => '12345',
-                'crm_uf'        => 'SP',
+                'name' => 'Dr. Pedro',
+                'email' => 'pedro@example.com',
+                'password' => 'Senha@1234',
+                'crm' => '12345',
+                'crm_uf' => 'SP',
                 'specialty_ids' => [$specialty->id],
             ])
             ->assertStatus(201)
@@ -78,11 +78,11 @@ describe('POST /api/v1/doctors', function () {
 
         $this->actingAs($admin)
             ->postJson('/api/v1/doctors', [
-                'name'     => 'Outro',
-                'email'    => 'outro@example.com',
+                'name' => 'Outro',
+                'email' => 'outro@example.com',
                 'password' => 'Senha@1234',
-                'crm'      => '99999',
-                'crm_uf'   => 'RJ',
+                'crm' => '99999',
+                'crm_uf' => 'RJ',
             ])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['crm']);
@@ -94,11 +94,11 @@ describe('POST /api/v1/doctors', function () {
 
         $this->actingAs($admin)
             ->postJson('/api/v1/doctors', [
-                'name'     => 'Outro RJ',
-                'email'    => 'outrj@example.com',
+                'name' => 'Outro RJ',
+                'email' => 'outrj@example.com',
                 'password' => 'Senha@1234',
-                'crm'      => '99999',
-                'crm_uf'   => 'RJ',
+                'crm' => '99999',
+                'crm_uf' => 'RJ',
             ])
             ->assertStatus(201);
     });
@@ -118,9 +118,9 @@ describe('POST /api/v1/doctors', function () {
 describe('GET /api/v1/doctors/{doctor}', function () {
 
     it('qualquer usuário autenticado visualiza médico com especialidades', function () {
-        $paciente  = User::factory()->paciente()->create();
+        $paciente = User::factory()->paciente()->create();
         $specialty = Specialty::factory()->create(['name' => 'Ortopedia']);
-        $doctor    = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
         $doctor->specialties()->attach($specialty);
 
         $this->actingAs($paciente)
@@ -133,13 +133,13 @@ describe('GET /api/v1/doctors/{doctor}', function () {
 describe('PUT /api/v1/doctors/{doctor}', function () {
 
     it('admin atualiza dados e especialidades do médico', function () {
-        $admin     = User::factory()->admin()->create();
-        $doctor    = Doctor::factory()->create();
+        $admin = User::factory()->admin()->create();
+        $doctor = Doctor::factory()->create();
         $specialty = Specialty::factory()->create();
 
         $this->actingAs($admin)
             ->putJson("/api/v1/doctors/{$doctor->id}", [
-                'bio'           => 'Nova bio.',
+                'bio' => 'Nova bio.',
                 'specialty_ids' => [$specialty->id],
             ])
             ->assertStatus(200)
@@ -148,7 +148,7 @@ describe('PUT /api/v1/doctors/{doctor}', function () {
     });
 
     it('médico atualiza o próprio bio e telefone', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
 
         $this->actingAs($user)
@@ -158,7 +158,7 @@ describe('PUT /api/v1/doctors/{doctor}', function () {
     });
 
     it('médico não pode alterar o próprio CRM', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
 
         $this->actingAs($user)
@@ -169,7 +169,7 @@ describe('PUT /api/v1/doctors/{doctor}', function () {
 
     it('paciente não pode atualizar médico', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         $this->actingAs($paciente)
             ->putJson("/api/v1/doctors/{$doctor->id}", ['bio' => 'x'])
@@ -180,7 +180,7 @@ describe('PUT /api/v1/doctors/{doctor}', function () {
 describe('PATCH /api/v1/doctors/{doctor}/toggle-active', function () {
 
     it('admin desativa médico e sincroniza status do usuário', function () {
-        $admin  = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $doctor = Doctor::factory()->create(['is_active' => true]);
 
         $this->actingAs($admin)
@@ -193,7 +193,7 @@ describe('PATCH /api/v1/doctors/{doctor}/toggle-active', function () {
 
     it('paciente não pode alterar status de médico', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         $this->actingAs($paciente)
             ->patchJson("/api/v1/doctors/{$doctor->id}/toggle-active")
@@ -204,7 +204,7 @@ describe('PATCH /api/v1/doctors/{doctor}/toggle-active', function () {
 describe('DELETE /api/v1/doctors/{doctor}', function () {
 
     it('admin remove médico (soft delete) e desativa o usuário', function () {
-        $admin  = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $doctor = Doctor::factory()->create();
 
         $this->actingAs($admin)
@@ -218,7 +218,7 @@ describe('DELETE /api/v1/doctors/{doctor}', function () {
 
     it('paciente não pode excluir médico', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         $this->actingAs($paciente)
             ->deleteJson("/api/v1/doctors/{$doctor->id}")

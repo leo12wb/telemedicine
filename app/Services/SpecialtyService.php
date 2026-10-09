@@ -33,9 +33,9 @@ class SpecialtyService
     public function create(array $data): Specialty
     {
         return Specialty::create([
-            'name'        => $data['name'],
+            'name' => $data['name'],
             'description' => $data['description'] ?? null,
-            'is_active'   => $data['is_active'] ?? true,
+            'is_active' => $data['is_active'] ?? true,
         ]);
     }
 

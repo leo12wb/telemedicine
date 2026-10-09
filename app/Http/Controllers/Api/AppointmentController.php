@@ -35,7 +35,7 @@ class AppointmentController extends Controller
     /** POST /api/v1/appointments */
     public function store(StoreAppointmentRequest $request): JsonResponse
     {
-        $user    = $request->user();
+        $user = $request->user();
         $patient = $user->isAdmin()
             ? Patient::findOrFail($request->validated()['patient_id'] ?? null)
             : Patient::where('user_id', $user->id)->firstOrFail();
@@ -103,7 +103,7 @@ class AppointmentController extends Controller
     public function finish(FinishAppointmentRequest $request, Appointment $appointment): AppointmentResource
     {
         $outcome = AppointmentStatus::from($request->validated()['outcome']);
-        $notes   = $request->validated()['notes'] ?? null;
+        $notes = $request->validated()['notes'] ?? null;
 
         $updated = $this->appointmentService->finish($appointment, $outcome, $notes);
 

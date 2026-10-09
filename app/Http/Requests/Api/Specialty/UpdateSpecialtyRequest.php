@@ -16,9 +16,9 @@ class UpdateSpecialtyRequest extends FormRequest
         $id = $this->route('specialty')->id;
 
         return [
-            'name'        => ['sometimes', 'string', 'max:100', "unique:specialties,name,{$id}"],
+            'name' => ['sometimes', 'string', 'max:100', "unique:specialties,name,{$id}"],
             'description' => ['sometimes', 'nullable', 'string', 'max:1000'],
-            'is_active'   => ['sometimes', 'boolean'],
+            'is_active' => ['sometimes', 'boolean'],
         ];
     }
 }

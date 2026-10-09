@@ -21,7 +21,7 @@ class FinishAppointmentRequest extends FormRequest
     {
         return [
             'outcome' => ['required', new Enum(AppointmentStatus::class), 'in:concluida,paciente_ausente'],
-            'notes'   => ['nullable', 'string'],
+            'notes' => ['nullable', 'string'],
         ];
     }
 }

@@ -28,7 +28,7 @@ describe('GET /api/v1/appointments', function () {
     });
 
     it('médico vê apenas suas consultas', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
         Appointment::factory()->forDoctor($doctor)->count(2)->create();
         Appointment::factory()->count(3)->create(); // outro médico
@@ -40,7 +40,7 @@ describe('GET /api/v1/appointments', function () {
     });
 
     it('paciente vê apenas suas consultas', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $patient = Patient::factory()->create(['user_id' => $user->id]);
         Appointment::factory()->forPatient($patient)->count(2)->create();
         Appointment::factory()->count(3)->create();
@@ -73,22 +73,22 @@ describe('POST /api/v1/appointments', function () {
         Notification::fake();
 
         $userPaciente = User::factory()->paciente()->create();
-        $patient      = Patient::factory()->create(['user_id' => $userPaciente->id]);
-        $doctor       = Doctor::factory()->create();
+        $patient = Patient::factory()->create(['user_id' => $userPaciente->id]);
+        $doctor = Doctor::factory()->create();
 
         // Cria horário para segunda próxima
         $nextMonday = Carbon::now()->next(Carbon::MONDAY);
         DoctorSchedule::factory()->forDoctor($doctor)->create([
-            'day_of_week'           => 1,
-            'start_time'            => '08:00:00',
-            'end_time'              => '12:00:00',
+            'day_of_week' => 1,
+            'start_time' => '08:00:00',
+            'end_time' => '12:00:00',
             'slot_duration_minutes' => 60,
-            'is_active'             => true,
+            'is_active' => true,
         ]);
 
         $this->actingAs($userPaciente)
             ->postJson('/api/v1/appointments', [
-                'doctor_id'      => $doctor->id,
+                'doctor_id' => $doctor->id,
                 'scheduled_date' => $nextMonday->format('Y-m-d'),
                 'scheduled_time' => '10:00',
             ])
@@ -96,9 +96,9 @@ describe('POST /api/v1/appointments', function () {
             ->assertJsonPath('data.status', 'agendada');
 
         $this->assertDatabaseHas('appointments', [
-            'doctor_id'  => $doctor->id,
+            'doctor_id' => $doctor->id,
             'patient_id' => $patient->id,
-            'status'     => AppointmentStatus::AGENDADA->value,
+            'status' => AppointmentStatus::AGENDADA->value,
         ]);
 
         Notification::assertSentTo($userPaciente, AppointmentBooked::class);
@@ -106,12 +106,12 @@ describe('POST /api/v1/appointments', function () {
     });
 
     it('médico não pode agendar consulta', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->create();
 
         $this->actingAs($user)
             ->postJson('/api/v1/appointments', [
-                'doctor_id'      => $doctor->id,
+                'doctor_id' => $doctor->id,
                 'scheduled_date' => Carbon::now()->addDays(3)->format('Y-m-d'),
                 'scheduled_time' => '10:00',
             ])
@@ -121,24 +121,24 @@ describe('POST /api/v1/appointments', function () {
     it('rejeita agendamento em slot já ocupado (anti double-booking)', function () {
         Notification::fake();
 
-        $user1    = User::factory()->paciente()->create();
+        $user1 = User::factory()->paciente()->create();
         $patient1 = Patient::factory()->create(['user_id' => $user1->id]);
-        $doctor   = Doctor::factory()->create();
-        $date     = Carbon::now()->addDays(5)->format('Y-m-d');
+        $doctor = Doctor::factory()->create();
+        $date = Carbon::now()->addDays(5)->format('Y-m-d');
 
         // Cria consulta existente no mesmo slot
         Appointment::factory()->forDoctor($doctor)->forPatient($patient1)->create([
             'scheduled_date' => $date,
             'scheduled_time' => '10:00:00',
-            'status'         => AppointmentStatus::AGENDADA,
+            'status' => AppointmentStatus::AGENDADA,
         ]);
 
-        $user2    = User::factory()->paciente()->create();
+        $user2 = User::factory()->paciente()->create();
         Patient::factory()->create(['user_id' => $user2->id]);
 
         $this->actingAs($user2)
             ->postJson('/api/v1/appointments', [
-                'doctor_id'      => $doctor->id,
+                'doctor_id' => $doctor->id,
                 'scheduled_date' => $date,
                 'scheduled_time' => '10:00',
             ])
@@ -147,13 +147,13 @@ describe('POST /api/v1/appointments', function () {
     });
 
     it('rejeita agendamento sem antecedência mínima de 2h', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         Patient::factory()->create(['user_id' => $user->id]);
-        $doctor  = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         $this->actingAs($user)
             ->postJson('/api/v1/appointments', [
-                'doctor_id'      => $doctor->id,
+                'doctor_id' => $doctor->id,
                 'scheduled_date' => Carbon::now()->format('Y-m-d'),
                 'scheduled_time' => Carbon::now()->addMinutes(30)->format('H:i'),
             ])
@@ -168,9 +168,9 @@ describe('POST /api/v1/appointments', function () {
 describe('GET /api/v1/appointments/{appointment}', function () {
 
     it('paciente visualiza sua própria consulta', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $patient = Patient::factory()->create(['user_id' => $user->id]);
-        $appt    = Appointment::factory()->forPatient($patient)->create();
+        $appt = Appointment::factory()->forPatient($patient)->create();
 
         $this->actingAs($user)
             ->getJson("/api/v1/appointments/{$appt->id}")
@@ -179,9 +179,9 @@ describe('GET /api/v1/appointments/{appointment}', function () {
     });
 
     it('paciente não visualiza consulta de outro paciente', function () {
-        $user  = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         Patient::factory()->create(['user_id' => $user->id]);
-        $appt  = Appointment::factory()->create(); // outro paciente
+        $appt = Appointment::factory()->create(); // outro paciente
 
         $this->actingAs($user)
             ->getJson("/api/v1/appointments/{$appt->id}")
@@ -198,7 +198,7 @@ describe('PATCH /api/v1/appointments/{appointment}/cancel', function () {
     it('admin cancela qualquer consulta', function () {
         Notification::fake();
         $admin = User::factory()->admin()->create();
-        $appt  = Appointment::factory()->scheduled()->create();
+        $appt = Appointment::factory()->scheduled()->create();
 
         $this->actingAs($admin)
             ->patchJson("/api/v1/appointments/{$appt->id}/cancel", ['reason' => 'Erro de sistema'])
@@ -206,7 +206,7 @@ describe('PATCH /api/v1/appointments/{appointment}/cancel', function () {
             ->assertJsonPath('data.status', 'cancelada');
 
         $this->assertDatabaseHas('appointments', [
-            'id'     => $appt->id,
+            'id' => $appt->id,
             'status' => AppointmentStatus::CANCELADA->value,
         ]);
 
@@ -215,9 +215,9 @@ describe('PATCH /api/v1/appointments/{appointment}/cancel', function () {
 
     it('médico cancela sua própria consulta', function () {
         Notification::fake();
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
-        $appt   = Appointment::factory()->forDoctor($doctor)->scheduled()->create([
+        $appt = Appointment::factory()->forDoctor($doctor)->scheduled()->create([
             'scheduled_date' => Carbon::now()->addDays(5)->format('Y-m-d'),
         ]);
 
@@ -228,8 +228,8 @@ describe('PATCH /api/v1/appointments/{appointment}/cancel', function () {
     });
 
     it('médico não pode cancelar consulta de outro médico', function () {
-        $user  = User::factory()->medico()->create();
-        $appt  = Appointment::factory()->scheduled()->create(); // outro médico
+        $user = User::factory()->medico()->create();
+        $appt = Appointment::factory()->scheduled()->create(); // outro médico
 
         $this->actingAs($user)
             ->patchJson("/api/v1/appointments/{$appt->id}/cancel")
@@ -237,7 +237,7 @@ describe('PATCH /api/v1/appointments/{appointment}/cancel', function () {
     });
 
     it('paciente não pode cancelar com menos de 24h de antecedência', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $patient = Patient::factory()->create(['user_id' => $user->id]);
 
         $appt = Appointment::factory()->forPatient($patient)->scheduled()->create([
@@ -252,7 +252,7 @@ describe('PATCH /api/v1/appointments/{appointment}/cancel', function () {
 
     it('não pode cancelar consulta já encerrada', function () {
         $admin = User::factory()->admin()->create();
-        $appt  = Appointment::factory()->concluded()->create();
+        $appt = Appointment::factory()->concluded()->create();
 
         $this->actingAs($admin)
             ->patchJson("/api/v1/appointments/{$appt->id}/cancel")
@@ -267,9 +267,9 @@ describe('PATCH /api/v1/appointments/{appointment}/cancel', function () {
 describe('PATCH /api/v1/appointments/{appointment}/start', function () {
 
     it('médico inicia sua consulta', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
-        $appt   = Appointment::factory()->forDoctor($doctor)->scheduled()->create();
+        $appt = Appointment::factory()->forDoctor($doctor)->scheduled()->create();
 
         $this->actingAs($user)
             ->patchJson("/api/v1/appointments/{$appt->id}/start")
@@ -280,9 +280,9 @@ describe('PATCH /api/v1/appointments/{appointment}/start', function () {
     });
 
     it('paciente não pode iniciar consulta', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $patient = Patient::factory()->create(['user_id' => $user->id]);
-        $appt    = Appointment::factory()->forPatient($patient)->scheduled()->create();
+        $appt = Appointment::factory()->forPatient($patient)->scheduled()->create();
 
         $this->actingAs($user)
             ->patchJson("/api/v1/appointments/{$appt->id}/start")
@@ -290,9 +290,9 @@ describe('PATCH /api/v1/appointments/{appointment}/start', function () {
     });
 
     it('não pode iniciar consulta que não está agendada', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
-        $appt   = Appointment::factory()->forDoctor($doctor)->inProgress()->create();
+        $appt = Appointment::factory()->forDoctor($doctor)->inProgress()->create();
 
         $this->actingAs($user)
             ->patchJson("/api/v1/appointments/{$appt->id}/start")
@@ -303,14 +303,14 @@ describe('PATCH /api/v1/appointments/{appointment}/start', function () {
 describe('PATCH /api/v1/appointments/{appointment}/finish', function () {
 
     it('médico encerra consulta como concluída', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
-        $appt   = Appointment::factory()->forDoctor($doctor)->inProgress()->create();
+        $appt = Appointment::factory()->forDoctor($doctor)->inProgress()->create();
 
         $this->actingAs($user)
             ->patchJson("/api/v1/appointments/{$appt->id}/finish", [
                 'outcome' => 'concluida',
-                'notes'   => 'Paciente em bom estado.',
+                'notes' => 'Paciente em bom estado.',
             ])
             ->assertStatus(200)
             ->assertJsonPath('data.status', 'concluida')
@@ -320,9 +320,9 @@ describe('PATCH /api/v1/appointments/{appointment}/finish', function () {
     });
 
     it('médico encerra como paciente ausente', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
-        $appt   = Appointment::factory()->forDoctor($doctor)->inProgress()->create();
+        $appt = Appointment::factory()->forDoctor($doctor)->inProgress()->create();
 
         $this->actingAs($user)
             ->patchJson("/api/v1/appointments/{$appt->id}/finish", ['outcome' => 'paciente_ausente'])
@@ -331,9 +331,9 @@ describe('PATCH /api/v1/appointments/{appointment}/finish', function () {
     });
 
     it('não pode encerrar consulta não iniciada', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
-        $appt   = Appointment::factory()->forDoctor($doctor)->scheduled()->create();
+        $appt = Appointment::factory()->forDoctor($doctor)->scheduled()->create();
 
         $this->actingAs($user)
             ->patchJson("/api/v1/appointments/{$appt->id}/finish", ['outcome' => 'concluida'])
@@ -341,9 +341,9 @@ describe('PATCH /api/v1/appointments/{appointment}/finish', function () {
     });
 
     it('rejeita desfecho inválido', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
-        $appt   = Appointment::factory()->forDoctor($doctor)->inProgress()->create();
+        $appt = Appointment::factory()->forDoctor($doctor)->inProgress()->create();
 
         $this->actingAs($user)
             ->patchJson("/api/v1/appointments/{$appt->id}/finish", ['outcome' => 'agendada'])
@@ -354,9 +354,9 @@ describe('PATCH /api/v1/appointments/{appointment}/finish', function () {
 describe('PATCH /api/v1/appointments/{appointment}/notes', function () {
 
     it('médico adiciona anotações clínicas', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
-        $appt   = Appointment::factory()->forDoctor($doctor)->inProgress()->create();
+        $appt = Appointment::factory()->forDoctor($doctor)->inProgress()->create();
 
         $this->actingAs($user)
             ->patchJson("/api/v1/appointments/{$appt->id}/notes", ['notes' => 'PA: 12x8. Sem queixas.'])
@@ -365,9 +365,9 @@ describe('PATCH /api/v1/appointments/{appointment}/notes', function () {
     });
 
     it('não pode editar anotações após encerramento', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
-        $appt   = Appointment::factory()->forDoctor($doctor)->concluded()->create();
+        $appt = Appointment::factory()->forDoctor($doctor)->concluded()->create();
 
         $this->actingAs($user)
             ->patchJson("/api/v1/appointments/{$appt->id}/notes", ['notes' => 'Tentativa pós-encerramento.'])
@@ -375,9 +375,9 @@ describe('PATCH /api/v1/appointments/{appointment}/notes', function () {
     });
 
     it('paciente não pode editar anotações', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $patient = Patient::factory()->create(['user_id' => $user->id]);
-        $appt    = Appointment::factory()->forPatient($patient)->inProgress()->create();
+        $appt = Appointment::factory()->forPatient($patient)->inProgress()->create();
 
         $this->actingAs($user)
             ->patchJson("/api/v1/appointments/{$appt->id}/notes", ['notes' => 'X'])

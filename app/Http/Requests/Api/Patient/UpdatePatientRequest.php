@@ -18,10 +18,10 @@ class UpdatePatientRequest extends FormRequest
         $patientId = $this->route('patient')->id;
 
         return [
-            'cpf'                     => ['sometimes', 'nullable', 'string', 'max:14', "unique:patients,cpf,{$patientId}"],
-            'birth_date'              => ['sometimes', 'nullable', 'date', 'before:today'],
-            'phone'                   => ['sometimes', 'nullable', 'string', 'max:20'],
-            'health_insurance'        => ['sometimes', 'nullable', 'string', 'max:100'],
+            'cpf' => ['sometimes', 'nullable', 'string', 'max:14', "unique:patients,cpf,{$patientId}"],
+            'birth_date' => ['sometimes', 'nullable', 'date', 'before:today'],
+            'phone' => ['sometimes', 'nullable', 'string', 'max:20'],
+            'health_insurance' => ['sometimes', 'nullable', 'string', 'max:100'],
             'health_insurance_number' => ['sometimes', 'nullable', 'string', 'max:50'],
         ];
     }

@@ -34,7 +34,7 @@ class AuthService
         $token = $user->createToken('api-token')->plainTextToken;
 
         return [
-            'user'  => $user,
+            'user' => $user,
             'token' => $token,
         ];
     }
@@ -45,10 +45,10 @@ class AuthService
     public function register(array $data): array
     {
         $user = User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
+            'name' => $data['name'],
+            'email' => $data['email'],
             'password' => $data['password'],
-            'role'     => UserRole::PACIENTE,
+            'role' => UserRole::PACIENTE,
             'is_active' => true,
         ]);
 
@@ -58,7 +58,7 @@ class AuthService
         $token = $user->createToken('api-token')->plainTextToken;
 
         return [
-            'user'  => $user,
+            'user' => $user,
             'token' => $token,
         ];
     }
@@ -96,7 +96,7 @@ class AuthService
             ['email' => $email, 'password' => $password, 'password_confirmation' => $password, 'token' => $token],
             function (User $user, string $password) {
                 $user->forceFill([
-                    'password'       => Hash::make($password),
+                    'password' => Hash::make($password),
                     'remember_token' => Str::random(60),
                 ])->save();
             }

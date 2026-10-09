@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\UserRole;
 use App\Models\User;
 
 describe('GET /api/v1/users', function () {
@@ -59,10 +58,10 @@ describe('POST /api/v1/users', function () {
 
         $this->actingAs($admin)
             ->postJson('/api/v1/users', [
-                'name'     => 'Dr. Carlos',
-                'email'    => 'carlos@example.com',
+                'name' => 'Dr. Carlos',
+                'email' => 'carlos@example.com',
                 'password' => 'Senha@1234',
-                'role'     => 'medico',
+                'role' => 'medico',
             ])
             ->assertStatus(201)
             ->assertJsonPath('data.role', 'medico')
@@ -76,10 +75,10 @@ describe('POST /api/v1/users', function () {
 
         $this->actingAs($paciente)
             ->postJson('/api/v1/users', [
-                'name'     => 'Novo',
-                'email'    => 'novo@example.com',
+                'name' => 'Novo',
+                'email' => 'novo@example.com',
                 'password' => 'Senha@1234',
-                'role'     => 'paciente',
+                'role' => 'paciente',
             ])
             ->assertStatus(403);
     });
@@ -90,10 +89,10 @@ describe('POST /api/v1/users', function () {
 
         $this->actingAs($admin)
             ->postJson('/api/v1/users', [
-                'name'     => 'Outro',
-                'email'    => 'existente@example.com',
+                'name' => 'Outro',
+                'email' => 'existente@example.com',
                 'password' => 'Senha@1234',
-                'role'     => 'paciente',
+                'role' => 'paciente',
             ])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['email']);
@@ -104,10 +103,10 @@ describe('POST /api/v1/users', function () {
 
         $this->actingAs($admin)
             ->postJson('/api/v1/users', [
-                'name'     => 'Teste',
-                'email'    => 'teste@example.com',
+                'name' => 'Teste',
+                'email' => 'teste@example.com',
                 'password' => 'Senha@1234',
-                'role'     => 'superadmin',
+                'role' => 'superadmin',
             ])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['role']);
@@ -118,7 +117,7 @@ describe('GET /api/v1/users/{user}', function () {
 
     it('admin visualiza qualquer usuário', function () {
         $admin = User::factory()->admin()->create();
-        $user  = User::factory()->paciente()->create(['name' => 'João Paciente']);
+        $user = User::factory()->paciente()->create(['name' => 'João Paciente']);
 
         $this->actingAs($admin)
             ->getJson("/api/v1/users/{$user->id}")
@@ -137,7 +136,7 @@ describe('GET /api/v1/users/{user}', function () {
 
     it('paciente não pode visualizar outro usuário', function () {
         $paciente = User::factory()->paciente()->create();
-        $outro    = User::factory()->paciente()->create();
+        $outro = User::factory()->paciente()->create();
 
         $this->actingAs($paciente)
             ->getJson("/api/v1/users/{$outro->id}")
@@ -149,7 +148,7 @@ describe('PUT /api/v1/users/{user}', function () {
 
     it('admin atualiza dados de qualquer usuário', function () {
         $admin = User::factory()->admin()->create();
-        $user  = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
 
         $this->actingAs($admin)
             ->putJson("/api/v1/users/{$user->id}", ['name' => 'Nome Atualizado'])
@@ -177,7 +176,7 @@ describe('PUT /api/v1/users/{user}', function () {
 
     it('paciente não pode atualizar outro usuário', function () {
         $paciente = User::factory()->paciente()->create();
-        $outro    = User::factory()->paciente()->create();
+        $outro = User::factory()->paciente()->create();
 
         $this->actingAs($paciente)
             ->putJson("/api/v1/users/{$outro->id}", ['name' => 'Invasão'])
@@ -189,7 +188,7 @@ describe('PATCH /api/v1/users/{user}/toggle-active', function () {
 
     it('admin desativa e reativa um usuário', function () {
         $admin = User::factory()->admin()->create();
-        $user  = User::factory()->create(['is_active' => true]);
+        $user = User::factory()->create(['is_active' => true]);
 
         $this->actingAs($admin)
             ->patchJson("/api/v1/users/{$user->id}/toggle-active")
@@ -204,7 +203,7 @@ describe('PATCH /api/v1/users/{user}/toggle-active', function () {
 
     it('paciente não pode alterar o status de outro usuário', function () {
         $paciente = User::factory()->paciente()->create();
-        $outro    = User::factory()->create();
+        $outro = User::factory()->create();
 
         $this->actingAs($paciente)
             ->patchJson("/api/v1/users/{$outro->id}/toggle-active")
@@ -216,7 +215,7 @@ describe('DELETE /api/v1/users/{user}', function () {
 
     it('admin remove um usuário (soft delete)', function () {
         $admin = User::factory()->admin()->create();
-        $user  = User::factory()->create();
+        $user = User::factory()->create();
 
         $this->actingAs($admin)
             ->deleteJson("/api/v1/users/{$user->id}")
@@ -236,7 +235,7 @@ describe('DELETE /api/v1/users/{user}', function () {
 
     it('paciente não pode excluir usuários', function () {
         $paciente = User::factory()->paciente()->create();
-        $outro    = User::factory()->create();
+        $outro = User::factory()->create();
 
         $this->actingAs($paciente)
             ->deleteJson("/api/v1/users/{$outro->id}")

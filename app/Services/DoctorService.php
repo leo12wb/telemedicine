@@ -27,7 +27,7 @@ class DoctorService
         }
 
         if (! empty($filters['search'])) {
-            $term = '%' . $filters['search'] . '%';
+            $term = '%'.$filters['search'].'%';
             $query->whereHas('user', fn ($q) => $q->where('name', 'like', $term)->orWhere('email', 'like', $term));
         }
 
@@ -41,19 +41,19 @@ class DoctorService
     {
         return DB::transaction(function () use ($data) {
             $user = User::create([
-                'name'      => $data['name'],
-                'email'     => $data['email'],
-                'password'  => $data['password'],
-                'role'      => UserRole::MEDICO,
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+                'role' => UserRole::MEDICO,
                 'is_active' => true,
             ]);
 
             $doctor = Doctor::create([
                 'user_id' => $user->id,
-                'crm'     => $data['crm'],
-                'crm_uf'  => strtoupper($data['crm_uf']),
-                'phone'   => $data['phone'] ?? null,
-                'bio'     => $data['bio'] ?? null,
+                'crm' => $data['crm'],
+                'crm_uf' => strtoupper($data['crm_uf']),
+                'phone' => $data['phone'] ?? null,
+                'bio' => $data['bio'] ?? null,
             ]);
 
             if (! empty($data['specialty_ids'])) {

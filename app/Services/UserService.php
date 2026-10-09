@@ -25,10 +25,10 @@ class UserService
         }
 
         if (isset($filters['search'])) {
-            $term = '%' . $filters['search'] . '%';
+            $term = '%'.$filters['search'].'%';
             $query->where(function ($q) use ($term) {
                 $q->where('name', 'like', $term)
-                  ->orWhere('email', 'like', $term);
+                    ->orWhere('email', 'like', $term);
             });
         }
 
@@ -41,10 +41,10 @@ class UserService
     public function create(array $data): User
     {
         return User::create([
-            'name'      => $data['name'],
-            'email'     => $data['email'],
-            'password'  => $data['password'],
-            'role'      => UserRole::from($data['role']),
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'role' => UserRole::from($data['role']),
             'is_active' => $data['is_active'] ?? true,
         ]);
     }
@@ -56,10 +56,10 @@ class UserService
     public function update(User $user, array $data): User
     {
         $payload = array_filter([
-            'name'      => $data['name'] ?? null,
-            'email'     => $data['email'] ?? null,
-            'password'  => isset($data['password']) ? Hash::make($data['password']) : null,
-            'role'      => isset($data['role']) ? UserRole::from($data['role']) : null,
+            'name' => $data['name'] ?? null,
+            'email' => $data['email'] ?? null,
+            'password' => isset($data['password']) ? Hash::make($data['password']) : null,
+            'role' => isset($data['role']) ? UserRole::from($data['role']) : null,
             'is_active' => $data['is_active'] ?? null,
         ], fn ($v) => $v !== null);
 

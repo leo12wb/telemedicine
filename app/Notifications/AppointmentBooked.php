@@ -22,15 +22,15 @@ class AppointmentBooked extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $appointment = $this->appointment;
-        $date        = $appointment->scheduled_date->format('d/m/Y');
-        $time        = substr($appointment->scheduled_time, 0, 5);
-        $doctor      = $appointment->doctor->user->name ?? 'Médico';
-        $patient     = $appointment->patient->user->name ?? 'Paciente';
+        $date = $appointment->scheduled_date->format('d/m/Y');
+        $time = substr($appointment->scheduled_time, 0, 5);
+        $doctor = $appointment->doctor->user->name ?? 'Médico';
+        $patient = $appointment->patient->user->name ?? 'Paciente';
 
         return (new MailMessage)
-            ->subject('Consulta agendada — ' . $date . ' às ' . $time)
-            ->greeting('Olá, ' . $notifiable->name . '!')
-            ->line("Uma consulta foi agendada com sucesso.")
+            ->subject('Consulta agendada — '.$date.' às '.$time)
+            ->greeting('Olá, '.$notifiable->name.'!')
+            ->line('Uma consulta foi agendada com sucesso.')
             ->line("**Médico:** {$doctor}")
             ->line("**Paciente:** {$patient}")
             ->line("**Data:** {$date} às {$time}")

@@ -10,12 +10,12 @@ class PatientFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id'                => User::factory()->paciente(),
-            'cpf'                    => null,
-            'birth_date'             => fake()->optional()->date('Y-m-d', '-18 years'),
-            'phone'                  => fake()->optional()->phoneNumber(),
-            'health_insurance'       => fake()->optional()->company(),
-            'health_insurance_number'=> fake()->optional()->numerify('######'),
+            'user_id' => User::factory()->paciente(),
+            'cpf' => null,
+            'birth_date' => fake()->optional()->date('Y-m-d', '-18 years'),
+            'phone' => fake()->optional()->phoneNumber(),
+            'health_insurance' => fake()->optional()->company(),
+            'health_insurance_number' => fake()->optional()->numerify('######'),
         ];
     }
 

@@ -12,18 +12,18 @@ describe('GET /api/v1/dashboard (admin)', function () {
     it('admin recebe totais e consultas do dia', function () {
         $admin = User::factory()->admin()->create();
 
-        $doctors  = Doctor::factory()->count(3)->create();
+        $doctors = Doctor::factory()->count(3)->create();
         $inactive = Doctor::factory()->inactive()->count(1)->create();
         $patients = Patient::factory()->count(5)->create();
 
         $today = Carbon::today()->format('Y-m-d');
         Appointment::factory()->forDoctor($doctors[0])->forPatient($patients[0])->count(2)->create([
             'scheduled_date' => $today,
-            'status'         => AppointmentStatus::AGENDADA,
+            'status' => AppointmentStatus::AGENDADA,
         ]);
         Appointment::factory()->forDoctor($doctors[1])->forPatient($patients[1])->count(1)->create([
             'scheduled_date' => $today,
-            'status'         => AppointmentStatus::CONCLUIDA,
+            'status' => AppointmentStatus::CONCLUIDA,
         ]);
 
         $response = $this->actingAs($admin)
@@ -38,8 +38,8 @@ describe('GET /api/v1/dashboard (admin)', function () {
     });
 
     it('admin vê consultas por status', function () {
-        $admin   = User::factory()->admin()->create();
-        $doctor  = Doctor::factory()->create();
+        $admin = User::factory()->admin()->create();
+        $doctor = Doctor::factory()->create();
         $patient = Patient::factory()->create();
         Appointment::factory()->forDoctor($doctor)->forPatient($patient)->scheduled()->count(2)->create();
         Appointment::factory()->forDoctor($doctor)->forPatient($patient)->concluded()->count(3)->create();
@@ -63,19 +63,19 @@ describe('GET /api/v1/dashboard (admin)', function () {
 describe('GET /api/v1/dashboard (médico)', function () {
 
     it('médico recebe agenda do dia e próximas consultas', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
 
-        $today    = Carbon::today()->format('Y-m-d');
+        $today = Carbon::today()->format('Y-m-d');
         $tomorrow = Carbon::tomorrow()->format('Y-m-d');
 
         Appointment::factory()->forDoctor($doctor)->count(2)->create([
             'scheduled_date' => $today,
-            'status'         => AppointmentStatus::AGENDADA,
+            'status' => AppointmentStatus::AGENDADA,
         ]);
         Appointment::factory()->forDoctor($doctor)->count(3)->create([
             'scheduled_date' => $tomorrow,
-            'status'         => AppointmentStatus::AGENDADA,
+            'status' => AppointmentStatus::AGENDADA,
         ]);
         // Outro médico — não deve aparecer
         Appointment::factory()->count(2)->create(['scheduled_date' => $today]);
@@ -89,13 +89,13 @@ describe('GET /api/v1/dashboard (médico)', function () {
     });
 
     it('conta ausências da semana', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
 
         $monday = Carbon::now()->startOfWeek()->format('Y-m-d');
         Appointment::factory()->forDoctor($doctor)->count(2)->create([
             'scheduled_date' => $monday,
-            'status'         => AppointmentStatus::PACIENTE_AUSENTE,
+            'status' => AppointmentStatus::PACIENTE_AUSENTE,
         ]);
 
         $response = $this->actingAs($user)
@@ -109,7 +109,7 @@ describe('GET /api/v1/dashboard (médico)', function () {
 describe('GET /api/v1/dashboard (paciente)', function () {
 
     it('paciente recebe próximas consultas e histórico', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $patient = Patient::factory()->create(['user_id' => $user->id]);
 
         $tomorrow = Carbon::tomorrow()->format('Y-m-d');
@@ -117,11 +117,11 @@ describe('GET /api/v1/dashboard (paciente)', function () {
 
         Appointment::factory()->forPatient($patient)->count(2)->create([
             'scheduled_date' => $tomorrow,
-            'status'         => AppointmentStatus::AGENDADA,
+            'status' => AppointmentStatus::AGENDADA,
         ]);
         Appointment::factory()->forPatient($patient)->count(3)->create([
             'scheduled_date' => $yesterday,
-            'status'         => AppointmentStatus::CONCLUIDA,
+            'status' => AppointmentStatus::CONCLUIDA,
         ]);
         // Outro paciente — não deve aparecer
         Appointment::factory()->count(2)->create(['scheduled_date' => $tomorrow]);

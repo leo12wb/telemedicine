@@ -9,9 +9,9 @@ class SpecialtyFactory extends Factory
     public function definition(): array
     {
         return [
-            'name'        => fake()->unique()->words(2, true),
+            'name' => fake()->unique()->words(2, true),
             'description' => fake()->optional()->sentence(),
-            'is_active'   => true,
+            'is_active' => true,
         ];
     }
 

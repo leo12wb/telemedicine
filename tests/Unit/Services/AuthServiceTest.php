@@ -40,8 +40,8 @@ describe('AuthService::register', function () {
         Event::fake([Registered::class]);
 
         $result = app(AuthService::class)->register([
-            'name'     => 'Novo Paciente',
-            'email'    => 'novo@example.com',
+            'name' => 'Novo Paciente',
+            'email' => 'novo@example.com',
             'password' => 'senha@1234',
         ]);
 

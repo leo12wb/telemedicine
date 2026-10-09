@@ -40,7 +40,7 @@ describe('SpecialtyService::create', function () {
 
     it('cria uma especialidade com os dados fornecidos', function () {
         $specialty = app(SpecialtyService::class)->create([
-            'name'        => 'Dermatologia',
+            'name' => 'Dermatologia',
             'description' => 'Pele e cabelo.',
         ]);
 

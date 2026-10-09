@@ -22,7 +22,7 @@ class DoctorController extends Controller
         $this->authorize('viewAny', Doctor::class);
 
         $onlyActive = ! $request->user()->isAdmin();
-        $doctors    = $this->doctorService->list($onlyActive, $request->only('specialty_id', 'search'));
+        $doctors = $this->doctorService->list($onlyActive, $request->only('specialty_id', 'search'));
 
         return DoctorResource::collection($doctors);
     }

@@ -10,14 +10,14 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'                => $this->id,
-            'name'              => $this->name,
-            'email'             => $this->email,
-            'role'              => $this->role->value,
-            'role_label'        => $this->role->label(),
-            'is_active'         => $this->is_active,
+            'id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
+            'role' => $this->role->value,
+            'role_label' => $this->role->label(),
+            'is_active' => $this->is_active,
             'email_verified_at' => $this->email_verified_at?->toISOString(),
-            'created_at'        => $this->created_at->toISOString(),
+            'created_at' => $this->created_at->toISOString(),
         ];
     }
 }

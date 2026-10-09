@@ -22,14 +22,14 @@ class AppointmentCancelled extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $appointment = $this->appointment;
-        $date        = $appointment->scheduled_date->format('d/m/Y');
-        $time        = substr($appointment->scheduled_time, 0, 5);
-        $reason      = $appointment->cancellation_reason ?? 'Não informado';
+        $date = $appointment->scheduled_date->format('d/m/Y');
+        $time = substr($appointment->scheduled_time, 0, 5);
+        $reason = $appointment->cancellation_reason ?? 'Não informado';
 
         return (new MailMessage)
-            ->subject('Consulta cancelada — ' . $date . ' às ' . $time)
-            ->greeting('Olá, ' . $notifiable->name . '!')
-            ->line("A consulta abaixo foi cancelada.")
+            ->subject('Consulta cancelada — '.$date.' às '.$time)
+            ->greeting('Olá, '.$notifiable->name.'!')
+            ->line('A consulta abaixo foi cancelada.')
             ->line("**Data:** {$date} às {$time}")
             ->line("**Motivo:** {$reason}")
             ->line('Se tiver dúvidas, entre em contato com nossa equipe.');

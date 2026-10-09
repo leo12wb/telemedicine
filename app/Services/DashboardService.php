@@ -21,10 +21,10 @@ class DashboardService
 
         return [
             'totals' => [
-                'doctors'  => Doctor::count(),
+                'doctors' => Doctor::count(),
                 'doctors_active' => Doctor::where('is_active', true)->count(),
                 'patients' => Patient::count(),
-                'users'    => User::count(),
+                'users' => User::count(),
             ],
             'appointments_by_status' => Appointment::selectRaw('status, COUNT(*) as total')
                 ->groupBy('status')
@@ -54,9 +54,9 @@ class DashboardService
     public function doctorDashboard(User $user): array
     {
         $doctor = Doctor::where('user_id', $user->id)->firstOrFail();
-        $today  = Carbon::today();
+        $today = Carbon::today();
         $weekStart = $today->copy()->startOfWeek();
-        $weekEnd   = $today->copy()->endOfWeek();
+        $weekEnd = $today->copy()->endOfWeek();
 
         $todayAppts = Appointment::with(['patient.user'])
             ->where('doctor_id', $doctor->id)
@@ -97,7 +97,7 @@ class DashboardService
     public function patientDashboard(User $user): array
     {
         $patient = Patient::where('user_id', $user->id)->firstOrFail();
-        $today   = Carbon::today();
+        $today = Carbon::today();
 
         $upcoming = Appointment::with(['doctor.user'])
             ->where('patient_id', $patient->id)
@@ -125,21 +125,21 @@ class DashboardService
 
         return [
             'upcoming_appointments' => $upcoming->map(fn ($a) => $this->appointmentSummary($a)),
-            'recent_history'        => $history->map(fn ($a) => $this->appointmentSummary($a)),
-            'total_concluded'       => $totalConcluidas,
+            'recent_history' => $history->map(fn ($a) => $this->appointmentSummary($a)),
+            'total_concluded' => $totalConcluidas,
         ];
     }
 
     private function appointmentSummary(Appointment $a): array
     {
         return [
-            'id'             => $a->id,
+            'id' => $a->id,
             'scheduled_date' => $a->scheduled_date->toDateString(),
             'scheduled_time' => substr($a->scheduled_time, 0, 5),
-            'status'         => $a->status->value,
-            'status_label'   => $a->status->label(),
-            'doctor_name'    => $a->relationLoaded('doctor') ? ($a->doctor->user->name ?? null) : null,
-            'patient_name'   => $a->relationLoaded('patient') ? ($a->patient->user->name ?? null) : null,
+            'status' => $a->status->value,
+            'status_label' => $a->status->label(),
+            'doctor_name' => $a->relationLoaded('doctor') ? ($a->doctor->user->name ?? null) : null,
+            'patient_name' => $a->relationLoaded('patient') ? ($a->patient->user->name ?? null) : null,
         ];
     }
 }

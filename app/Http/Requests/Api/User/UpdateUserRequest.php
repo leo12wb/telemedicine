@@ -21,11 +21,11 @@ class UpdateUserRequest extends FormRequest
         $isAdmin = $this->user()->isAdmin();
 
         return [
-            'name'     => ['sometimes', 'string', 'max:255'],
-            'email'    => ['sometimes', 'email', 'max:255', 'unique:users,email,' . $this->route('user')->id],
+            'name' => ['sometimes', 'string', 'max:255'],
+            'email' => ['sometimes', 'email', 'max:255', 'unique:users,email,'.$this->route('user')->id],
             'password' => ['sometimes', Password::min(8)->mixedCase()->numbers()->symbols()],
             // Somente admin pode alterar role e status
-            'role'      => $isAdmin ? ['sometimes', new Enum(UserRole::class)] : ['prohibited'],
+            'role' => $isAdmin ? ['sometimes', new Enum(UserRole::class)] : ['prohibited'],
             'is_active' => $isAdmin ? ['sometimes', 'boolean'] : ['prohibited'],
         ];
     }

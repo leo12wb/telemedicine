@@ -9,6 +9,7 @@ use App\Models\Patient;
 use App\Models\User;
 use App\Notifications\AppointmentBooked;
 use App\Notifications\AppointmentCancelled;
+use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -62,7 +63,7 @@ class AppointmentService
     {
         // Normaliza HH:MM → HH:MM:00 para consistência com o banco
         $data['scheduled_time'] = strlen($data['scheduled_time']) === 5
-            ? $data['scheduled_time'] . ':00'
+            ? $data['scheduled_time'].':00'
             : $data['scheduled_time'];
 
         return DB::transaction(function () use ($data, $patient) {
@@ -81,8 +82,8 @@ class AppointmentService
             }
 
             // Verifica antecedência mínima de 2 horas (RN-013)
-            $scheduledAt = \Carbon\Carbon::parse(
-                $data['scheduled_date'] . ' ' . $data['scheduled_time']
+            $scheduledAt = Carbon::parse(
+                $data['scheduled_date'].' '.$data['scheduled_time']
             );
 
             if ($scheduledAt->diffInMinutes(now(), false) > -120) {
@@ -94,14 +95,14 @@ class AppointmentService
             $doctor = Doctor::findOrFail($data['doctor_id']);
 
             $appointment = Appointment::create([
-                'doctor_id'        => $data['doctor_id'],
-                'patient_id'       => $patient->id,
-                'scheduled_date'   => $data['scheduled_date'],
-                'scheduled_time'   => $data['scheduled_time'],
+                'doctor_id' => $data['doctor_id'],
+                'patient_id' => $patient->id,
+                'scheduled_date' => $data['scheduled_date'],
+                'scheduled_time' => $data['scheduled_time'],
                 'duration_minutes' => $doctor->schedules()
                     ->where('is_active', true)
                     ->value('slot_duration_minutes') ?? 30,
-                'status'           => AppointmentStatus::AGENDADA,
+                'status' => AppointmentStatus::AGENDADA,
             ]);
 
             $appointment->load('doctor.user', 'patient.user');
@@ -129,8 +130,8 @@ class AppointmentService
 
         // Prazo para cancelamento pelo paciente: 24h antes (RN-014)
         if ($actor->role->value === 'paciente') {
-            $scheduledAt = \Carbon\Carbon::parse(
-                $appointment->scheduled_date->toDateString() . ' ' . $appointment->scheduled_time
+            $scheduledAt = Carbon::parse(
+                $appointment->scheduled_date->toDateString().' '.$appointment->scheduled_time
             );
 
             if ($scheduledAt->diffInHours(now(), false) > -24) {
@@ -141,8 +142,8 @@ class AppointmentService
         }
 
         $appointment->update([
-            'status'              => AppointmentStatus::CANCELADA,
-            'cancelled_by'        => $actor->id,
+            'status' => AppointmentStatus::CANCELADA,
+            'cancelled_by' => $actor->id,
             'cancellation_reason' => $reason,
         ]);
 
@@ -170,7 +171,7 @@ class AppointmentService
             $this->cancel($appointment, $patient->user, 'Reagendamento solicitado pelo paciente.');
 
             return $this->create([
-                'doctor_id'      => $appointment->doctor_id,
+                'doctor_id' => $appointment->doctor_id,
                 'scheduled_date' => $data['scheduled_date'],
                 'scheduled_time' => $data['scheduled_time'],
             ], $patient);
@@ -190,7 +191,7 @@ class AppointmentService
         }
 
         $appointment->update([
-            'status'     => AppointmentStatus::EM_ANDAMENTO,
+            'status' => AppointmentStatus::EM_ANDAMENTO,
             'started_at' => now(),
         ]);
 
@@ -215,9 +216,9 @@ class AppointmentService
         }
 
         $appointment->update([
-            'status'   => $outcome,
+            'status' => $outcome,
             'ended_at' => now(),
-            'notes'    => $notes ?? $appointment->notes,
+            'notes' => $notes ?? $appointment->notes,
         ]);
 
         return $appointment->fresh(['doctor.user', 'patient.user']);

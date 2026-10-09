@@ -22,11 +22,11 @@ class AvailabilityService
     public function createSchedule(Doctor $doctor, array $data): DoctorSchedule
     {
         return $doctor->schedules()->create([
-            'day_of_week'           => $data['day_of_week'],
-            'start_time'            => $data['start_time'],
-            'end_time'              => $data['end_time'],
+            'day_of_week' => $data['day_of_week'],
+            'start_time' => $data['start_time'],
+            'end_time' => $data['end_time'],
             'slot_duration_minutes' => $data['slot_duration_minutes'],
-            'is_active'             => $data['is_active'] ?? true,
+            'is_active' => $data['is_active'] ?? true,
         ]);
     }
 
@@ -62,10 +62,10 @@ class AvailabilityService
     public function createBlock(Doctor $doctor, array $data): DoctorBlock
     {
         return $doctor->blocks()->create([
-            'block_date'  => $data['block_date'],
+            'block_date' => $data['block_date'],
             'block_start' => $data['block_start'] ?? null,
-            'block_end'   => $data['block_end'] ?? null,
-            'reason'      => $data['reason'] ?? null,
+            'block_end' => $data['block_end'] ?? null,
+            'reason' => $data['reason'] ?? null,
         ]);
     }
 
@@ -91,8 +91,8 @@ class AvailabilityService
      */
     public function getAvailableSlots(Doctor $doctor, string $date): array
     {
-        $carbon     = Carbon::parse($date);
-        $dayOfWeek  = (int) $carbon->dayOfWeek; // 0=Dom ... 6=Sáb
+        $carbon = Carbon::parse($date);
+        $dayOfWeek = (int) $carbon->dayOfWeek; // 0=Dom ... 6=Sáb
 
         // 1. Horários ativos para o dia
         $schedules = $doctor->schedules()
@@ -121,12 +121,12 @@ class AvailabilityService
 
         foreach ($schedules as $schedule) {
             $current = Carbon::createFromFormat('H:i:s', $schedule->start_time);
-            $end     = Carbon::createFromFormat('H:i:s', $schedule->end_time);
-            $step    = $schedule->slot_duration_minutes;
+            $end = Carbon::createFromFormat('H:i:s', $schedule->end_time);
+            $step = $schedule->slot_duration_minutes;
 
             while ($current->copy()->addMinutes($step)->lte($end)) {
                 $slots[] = [
-                    'time'        => $current->format('H:i'),
+                    'time' => $current->format('H:i'),
                     'schedule_id' => $schedule->id,
                 ];
                 $current->addMinutes($step);
@@ -142,7 +142,7 @@ class AvailabilityService
 
                 foreach ($partialBlocks as $block) {
                     $blockStart = Carbon::createFromFormat('H:i:s', $block->block_start);
-                    $blockEnd   = Carbon::createFromFormat('H:i:s', $block->block_end);
+                    $blockEnd = Carbon::createFromFormat('H:i:s', $block->block_end);
 
                     if ($slotTime->gte($blockStart) && $slotTime->lt($blockEnd)) {
                         return false;

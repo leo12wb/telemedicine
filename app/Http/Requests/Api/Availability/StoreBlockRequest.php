@@ -11,7 +11,7 @@ class StoreBlockRequest extends FormRequest
     {
         /** @var Doctor $doctor */
         $doctor = $this->route('doctor');
-        $user   = $this->user();
+        $user = $this->user();
 
         return $user->isAdmin() || $doctor->user_id === $user->id;
     }
@@ -19,10 +19,10 @@ class StoreBlockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'block_date'  => ['required', 'date', 'date_format:Y-m-d'],
+            'block_date' => ['required', 'date', 'date_format:Y-m-d'],
             'block_start' => ['nullable', 'date_format:H:i', 'required_with:block_end'],
-            'block_end'   => ['nullable', 'date_format:H:i', 'after:block_start', 'required_with:block_start'],
-            'reason'      => ['nullable', 'string', 'max:255'],
+            'block_end' => ['nullable', 'date_format:H:i', 'after:block_start', 'required_with:block_start'],
+            'reason' => ['nullable', 'string', 'max:255'],
         ];
     }
 }

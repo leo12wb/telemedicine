@@ -10,11 +10,11 @@ class DoctorBlockFactory extends Factory
     public function definition(): array
     {
         return [
-            'doctor_id'   => Doctor::factory(),
-            'block_date'  => $this->faker->dateTimeBetween('now', '+30 days')->format('Y-m-d'),
+            'doctor_id' => Doctor::factory(),
+            'block_date' => $this->faker->dateTimeBetween('now', '+30 days')->format('Y-m-d'),
             'block_start' => null,
-            'block_end'   => null,
-            'reason'      => $this->faker->optional()->sentence(),
+            'block_end' => null,
+            'reason' => $this->faker->optional()->sentence(),
         ];
     }
 

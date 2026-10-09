@@ -47,10 +47,10 @@ describe('UserService::create', function () {
 
     it('cria usuário com os dados fornecidos', function () {
         $user = app(UserService::class)->create([
-            'name'     => 'Dr. João',
-            'email'    => 'joao@example.com',
+            'name' => 'Dr. João',
+            'email' => 'joao@example.com',
             'password' => 'Senha@1234',
-            'role'     => 'medico',
+            'role' => 'medico',
         ]);
 
         expect($user->role)->toBe(UserRole::MEDICO)

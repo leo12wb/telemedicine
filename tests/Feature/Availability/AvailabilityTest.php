@@ -14,7 +14,7 @@ describe('GET /api/v1/doctors/{doctor}/schedules', function () {
 
     it('qualquer usuário autenticado lista os horários de um médico', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
         DoctorSchedule::factory()->forDoctor($doctor)->count(3)->create();
 
         $this->actingAs($paciente)
@@ -34,14 +34,14 @@ describe('GET /api/v1/doctors/{doctor}/schedules', function () {
 describe('POST /api/v1/doctors/{doctor}/schedules', function () {
 
     it('médico cria seu próprio horário', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
 
         $this->actingAs($user)
             ->postJson("/api/v1/doctors/{$doctor->id}/schedules", [
-                'day_of_week'           => 1,
-                'start_time'            => '08:00',
-                'end_time'              => '12:00',
+                'day_of_week' => 1,
+                'start_time' => '08:00',
+                'end_time' => '12:00',
                 'slot_duration_minutes' => 30,
             ])
             ->assertStatus(201)
@@ -52,14 +52,14 @@ describe('POST /api/v1/doctors/{doctor}/schedules', function () {
     });
 
     it('admin cria horário para qualquer médico', function () {
-        $admin  = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $doctor = Doctor::factory()->create();
 
         $this->actingAs($admin)
             ->postJson("/api/v1/doctors/{$doctor->id}/schedules", [
-                'day_of_week'           => 3,
-                'start_time'            => '14:00',
-                'end_time'              => '18:00',
+                'day_of_week' => 3,
+                'start_time' => '14:00',
+                'end_time' => '18:00',
                 'slot_duration_minutes' => 60,
             ])
             ->assertStatus(201);
@@ -67,41 +67,41 @@ describe('POST /api/v1/doctors/{doctor}/schedules', function () {
 
     it('paciente não pode criar horário de médico', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         $this->actingAs($paciente)
             ->postJson("/api/v1/doctors/{$doctor->id}/schedules", [
-                'day_of_week'           => 1,
-                'start_time'            => '08:00',
-                'end_time'              => '12:00',
+                'day_of_week' => 1,
+                'start_time' => '08:00',
+                'end_time' => '12:00',
                 'slot_duration_minutes' => 30,
             ])
             ->assertStatus(403);
     });
 
     it('médico não pode criar horário de outro médico', function () {
-        $user     = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $outroDoc = Doctor::factory()->create();
 
         $this->actingAs($user)
             ->postJson("/api/v1/doctors/{$outroDoc->id}/schedules", [
-                'day_of_week'           => 1,
-                'start_time'            => '08:00',
-                'end_time'              => '12:00',
+                'day_of_week' => 1,
+                'start_time' => '08:00',
+                'end_time' => '12:00',
                 'slot_duration_minutes' => 30,
             ])
             ->assertStatus(403);
     });
 
     it('rejeita end_time anterior ao start_time', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
 
         $this->actingAs($user)
             ->postJson("/api/v1/doctors/{$doctor->id}/schedules", [
-                'day_of_week'           => 1,
-                'start_time'            => '12:00',
-                'end_time'              => '08:00',
+                'day_of_week' => 1,
+                'start_time' => '12:00',
+                'end_time' => '08:00',
                 'slot_duration_minutes' => 30,
             ])
             ->assertStatus(422)
@@ -109,14 +109,14 @@ describe('POST /api/v1/doctors/{doctor}/schedules', function () {
     });
 
     it('rejeita duração de slot inválida', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
 
         $this->actingAs($user)
             ->postJson("/api/v1/doctors/{$doctor->id}/schedules", [
-                'day_of_week'           => 1,
-                'start_time'            => '08:00',
-                'end_time'              => '12:00',
+                'day_of_week' => 1,
+                'start_time' => '08:00',
+                'end_time' => '12:00',
                 'slot_duration_minutes' => 25,
             ])
             ->assertStatus(422)
@@ -127,8 +127,8 @@ describe('POST /api/v1/doctors/{doctor}/schedules', function () {
 describe('PUT /api/v1/doctors/{doctor}/schedules/{schedule}', function () {
 
     it('médico atualiza seu próprio horário', function () {
-        $user     = User::factory()->medico()->create();
-        $doctor   = Doctor::factory()->forUser($user)->create();
+        $user = User::factory()->medico()->create();
+        $doctor = Doctor::factory()->forUser($user)->create();
         $schedule = DoctorSchedule::factory()->forDoctor($doctor)->create(['is_active' => true]);
 
         $this->actingAs($user)
@@ -140,9 +140,9 @@ describe('PUT /api/v1/doctors/{doctor}/schedules/{schedule}', function () {
     });
 
     it('retorna 404 para horário de outro médico', function () {
-        $admin    = User::factory()->admin()->create();
-        $doctor1  = Doctor::factory()->create();
-        $doctor2  = Doctor::factory()->create();
+        $admin = User::factory()->admin()->create();
+        $doctor1 = Doctor::factory()->create();
+        $doctor2 = Doctor::factory()->create();
         $schedule = DoctorSchedule::factory()->forDoctor($doctor2)->create();
 
         $this->actingAs($admin)
@@ -154,8 +154,8 @@ describe('PUT /api/v1/doctors/{doctor}/schedules/{schedule}', function () {
 describe('DELETE /api/v1/doctors/{doctor}/schedules/{schedule}', function () {
 
     it('médico remove seu próprio horário', function () {
-        $user     = User::factory()->medico()->create();
-        $doctor   = Doctor::factory()->forUser($user)->create();
+        $user = User::factory()->medico()->create();
+        $doctor = Doctor::factory()->forUser($user)->create();
         $schedule = DoctorSchedule::factory()->forDoctor($doctor)->create();
 
         $this->actingAs($user)
@@ -168,7 +168,7 @@ describe('DELETE /api/v1/doctors/{doctor}/schedules/{schedule}', function () {
 
     it('paciente não pode excluir horário', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
         $schedule = DoctorSchedule::factory()->forDoctor($doctor)->create();
 
         $this->actingAs($paciente)
@@ -184,7 +184,7 @@ describe('DELETE /api/v1/doctors/{doctor}/schedules/{schedule}', function () {
 describe('GET /api/v1/doctors/{doctor}/blocks', function () {
 
     it('lista bloqueios de um médico', function () {
-        $admin  = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $doctor = Doctor::factory()->create();
         DoctorBlock::factory()->forDoctor($doctor)->count(2)->create();
 
@@ -195,7 +195,7 @@ describe('GET /api/v1/doctors/{doctor}/blocks', function () {
     });
 
     it('filtra por período', function () {
-        $admin  = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $doctor = Doctor::factory()->create();
         DoctorBlock::factory()->forDoctor($doctor)->create(['block_date' => '2030-01-10']);
         DoctorBlock::factory()->forDoctor($doctor)->create(['block_date' => '2030-02-10']);
@@ -210,13 +210,13 @@ describe('GET /api/v1/doctors/{doctor}/blocks', function () {
 describe('POST /api/v1/doctors/{doctor}/blocks', function () {
 
     it('médico cria bloqueio de dia inteiro', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
 
         $this->actingAs($user)
             ->postJson("/api/v1/doctors/{$doctor->id}/blocks", [
                 'block_date' => '2030-12-25',
-                'reason'     => 'Natal',
+                'reason' => 'Natal',
             ])
             ->assertStatus(201)
             ->assertJsonPath('data.block_date', '2030-12-25')
@@ -224,34 +224,34 @@ describe('POST /api/v1/doctors/{doctor}/blocks', function () {
     });
 
     it('médico cria bloqueio parcial', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
 
         $this->actingAs($user)
             ->postJson("/api/v1/doctors/{$doctor->id}/blocks", [
-                'block_date'  => '2030-11-01',
+                'block_date' => '2030-11-01',
                 'block_start' => '10:00',
-                'block_end'   => '12:00',
+                'block_end' => '12:00',
             ])
             ->assertStatus(201)
             ->assertJsonPath('data.is_all_day', false);
     });
 
     it('rejeita block_end sem block_start', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
 
         $this->actingAs($user)
             ->postJson("/api/v1/doctors/{$doctor->id}/blocks", [
                 'block_date' => '2030-11-01',
-                'block_end'  => '12:00',
+                'block_end' => '12:00',
             ])
             ->assertStatus(422);
     });
 
     it('paciente não pode criar bloqueio', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         $this->actingAs($paciente)
             ->postJson("/api/v1/doctors/{$doctor->id}/blocks", [
@@ -264,9 +264,9 @@ describe('POST /api/v1/doctors/{doctor}/blocks', function () {
 describe('DELETE /api/v1/doctors/{doctor}/blocks/{block}', function () {
 
     it('médico remove seu bloqueio', function () {
-        $user   = User::factory()->medico()->create();
+        $user = User::factory()->medico()->create();
         $doctor = Doctor::factory()->forUser($user)->create();
-        $block  = DoctorBlock::factory()->forDoctor($doctor)->create();
+        $block = DoctorBlock::factory()->forDoctor($doctor)->create();
 
         $this->actingAs($user)
             ->deleteJson("/api/v1/doctors/{$doctor->id}/blocks/{$block->id}")
@@ -285,16 +285,16 @@ describe('GET /api/v1/doctors/{doctor}/availability', function () {
 
     it('retorna slots disponíveis conforme o horário configurado', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         // Segunda-feira = 1
         $nextMonday = Carbon::now()->next(Carbon::MONDAY)->format('Y-m-d');
         DoctorSchedule::factory()->forDoctor($doctor)->create([
-            'day_of_week'           => 1,
-            'start_time'            => '08:00:00',
-            'end_time'              => '10:00:00',
+            'day_of_week' => 1,
+            'start_time' => '08:00:00',
+            'end_time' => '10:00:00',
             'slot_duration_minutes' => 60,
-            'is_active'             => true,
+            'is_active' => true,
         ]);
 
         $response = $this->actingAs($paciente)
@@ -309,7 +309,7 @@ describe('GET /api/v1/doctors/{doctor}/availability', function () {
 
     it('retorna array vazio quando não há horário no dia', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         // Nenhum horário cadastrado
         $this->actingAs($paciente)
@@ -320,22 +320,22 @@ describe('GET /api/v1/doctors/{doctor}/availability', function () {
 
     it('retorna array vazio quando há bloqueio de dia inteiro', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         DoctorSchedule::factory()->forDoctor($doctor)->create([
-            'day_of_week'           => 1,
-            'start_time'            => '08:00:00',
-            'end_time'              => '12:00:00',
+            'day_of_week' => 1,
+            'start_time' => '08:00:00',
+            'end_time' => '12:00:00',
             'slot_duration_minutes' => 30,
-            'is_active'             => true,
+            'is_active' => true,
         ]);
 
         // Bloqueio de dia inteiro na próxima segunda
         $nextMonday = Carbon::now()->next(Carbon::MONDAY)->format('Y-m-d');
         DoctorBlock::factory()->forDoctor($doctor)->create([
-            'block_date'  => $nextMonday,
+            'block_date' => $nextMonday,
             'block_start' => null,
-            'block_end'   => null,
+            'block_end' => null,
         ]);
 
         $this->actingAs($paciente)
@@ -346,22 +346,22 @@ describe('GET /api/v1/doctors/{doctor}/availability', function () {
 
     it('remove slots cobertos por bloqueio parcial', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         $nextMonday = Carbon::now()->next(Carbon::MONDAY)->format('Y-m-d');
         DoctorSchedule::factory()->forDoctor($doctor)->create([
-            'day_of_week'           => 1,
-            'start_time'            => '08:00:00',
-            'end_time'              => '12:00:00',
+            'day_of_week' => 1,
+            'start_time' => '08:00:00',
+            'end_time' => '12:00:00',
             'slot_duration_minutes' => 60,
-            'is_active'             => true,
+            'is_active' => true,
         ]);
 
         // Bloqueia 09:00–11:00 (remove slots 09:00 e 10:00)
         DoctorBlock::factory()->forDoctor($doctor)->create([
-            'block_date'  => $nextMonday,
+            'block_date' => $nextMonday,
             'block_start' => '09:00:00',
-            'block_end'   => '11:00:00',
+            'block_end' => '11:00:00',
         ]);
 
         $response = $this->actingAs($paciente)
@@ -379,15 +379,15 @@ describe('GET /api/v1/doctors/{doctor}/availability', function () {
 
     it('não retorna slots de horário inativo', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         $nextMonday = Carbon::now()->next(Carbon::MONDAY)->format('Y-m-d');
         DoctorSchedule::factory()->forDoctor($doctor)->create([
-            'day_of_week'           => 1,
-            'start_time'            => '08:00:00',
-            'end_time'              => '12:00:00',
+            'day_of_week' => 1,
+            'start_time' => '08:00:00',
+            'end_time' => '12:00:00',
             'slot_duration_minutes' => 30,
-            'is_active'             => false,
+            'is_active' => false,
         ]);
 
         $this->actingAs($paciente)
@@ -398,7 +398,7 @@ describe('GET /api/v1/doctors/{doctor}/availability', function () {
 
     it('rejeita requisição sem parâmetro date', function () {
         $paciente = User::factory()->paciente()->create();
-        $doctor   = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
 
         $this->actingAs($paciente)
             ->getJson("/api/v1/doctors/{$doctor->id}/availability")

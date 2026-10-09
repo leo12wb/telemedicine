@@ -12,13 +12,13 @@ class DoctorFactory extends Factory
         $ufs = ['SP', 'RJ', 'MG', 'RS', 'PR', 'BA', 'CE', 'GO', 'PE', 'SC'];
 
         return [
-            'user_id'    => User::factory()->medico(),
-            'crm'        => fake()->unique()->numerify('#####'),
-            'crm_uf'     => fake()->randomElement($ufs),
-            'phone'      => fake()->optional()->phoneNumber(),
-            'bio'        => fake()->optional()->sentence(),
+            'user_id' => User::factory()->medico(),
+            'crm' => fake()->unique()->numerify('#####'),
+            'crm_uf' => fake()->randomElement($ufs),
+            'phone' => fake()->optional()->phoneNumber(),
+            'bio' => fake()->optional()->sentence(),
             'photo_path' => null,
-            'is_active'  => true,
+            'is_active' => true,
         ];
     }
 

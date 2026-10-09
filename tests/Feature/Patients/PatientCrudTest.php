@@ -53,7 +53,7 @@ describe('GET /api/v1/patients/profile', function () {
     });
 
     it('retorna perfil existente sem duplicar', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $patient = Patient::factory()->forUser($user)->create();
 
         $this->actingAs($user)
@@ -72,11 +72,11 @@ describe('POST /api/v1/patients', function () {
 
         $this->actingAs($admin)
             ->postJson('/api/v1/patients', [
-                'name'            => 'Ana Paciente',
-                'email'           => 'ana@example.com',
-                'password'        => 'Senha@1234',
-                'birth_date'      => '1990-05-15',
-                'health_insurance'=> 'Unimed',
+                'name' => 'Ana Paciente',
+                'email' => 'ana@example.com',
+                'password' => 'Senha@1234',
+                'birth_date' => '1990-05-15',
+                'health_insurance' => 'Unimed',
             ])
             ->assertStatus(201)
             ->assertJsonPath('data.health_insurance', 'Unimed')
@@ -92,10 +92,10 @@ describe('POST /api/v1/patients', function () {
 
         $this->actingAs($admin)
             ->postJson('/api/v1/patients', [
-                'name'     => 'Outro',
-                'email'    => 'outro@example.com',
+                'name' => 'Outro',
+                'email' => 'outro@example.com',
                 'password' => 'Senha@1234',
-                'cpf'      => '123.456.789-00',
+                'cpf' => '123.456.789-00',
             ])
             ->assertStatus(422)
             ->assertJsonValidationErrors(['cpf']);
@@ -115,7 +115,7 @@ describe('POST /api/v1/patients', function () {
 describe('GET /api/v1/patients/{patient}', function () {
 
     it('admin visualiza qualquer paciente', function () {
-        $admin   = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $patient = Patient::factory()->create();
 
         $this->actingAs($admin)
@@ -125,7 +125,7 @@ describe('GET /api/v1/patients/{patient}', function () {
     });
 
     it('paciente visualiza o próprio perfil', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $patient = Patient::factory()->forUser($user)->create();
 
         $this->actingAs($user)
@@ -134,7 +134,7 @@ describe('GET /api/v1/patients/{patient}', function () {
     });
 
     it('médico visualiza perfil de paciente', function () {
-        $medico  = User::factory()->medico()->create();
+        $medico = User::factory()->medico()->create();
         $patient = Patient::factory()->create();
 
         $this->actingAs($medico)
@@ -144,7 +144,7 @@ describe('GET /api/v1/patients/{patient}', function () {
 
     it('paciente não visualiza perfil de outro paciente', function () {
         $paciente1 = User::factory()->paciente()->create();
-        $patient2  = Patient::factory()->create();
+        $patient2 = Patient::factory()->create();
 
         $this->actingAs($paciente1)
             ->getJson("/api/v1/patients/{$patient2->id}")
@@ -155,20 +155,20 @@ describe('GET /api/v1/patients/{patient}', function () {
 describe('PUT /api/v1/patients/{patient}', function () {
 
     it('paciente atualiza o próprio perfil clínico', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $patient = Patient::factory()->forUser($user)->create();
 
         $this->actingAs($user)
             ->putJson("/api/v1/patients/{$patient->id}", [
                 'health_insurance' => 'Bradesco Saúde',
-                'phone'            => '11999999999',
+                'phone' => '11999999999',
             ])
             ->assertStatus(200)
             ->assertJsonPath('data.health_insurance', 'Bradesco Saúde');
     });
 
     it('admin atualiza perfil de qualquer paciente', function () {
-        $admin   = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $patient = Patient::factory()->create();
 
         $this->actingAs($admin)
@@ -179,7 +179,7 @@ describe('PUT /api/v1/patients/{patient}', function () {
 
     it('paciente não atualiza perfil de outro paciente', function () {
         $paciente1 = User::factory()->paciente()->create();
-        $patient2  = Patient::factory()->create();
+        $patient2 = Patient::factory()->create();
 
         $this->actingAs($paciente1)
             ->putJson("/api/v1/patients/{$patient2->id}", ['phone' => '99999999'])
@@ -190,7 +190,7 @@ describe('PUT /api/v1/patients/{patient}', function () {
 describe('DELETE /api/v1/patients/{patient}', function () {
 
     it('admin remove paciente (soft delete) e desativa usuário', function () {
-        $admin   = User::factory()->admin()->create();
+        $admin = User::factory()->admin()->create();
         $patient = Patient::factory()->create();
 
         $this->actingAs($admin)
@@ -203,7 +203,7 @@ describe('DELETE /api/v1/patients/{patient}', function () {
     });
 
     it('paciente não pode se excluir', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $patient = Patient::factory()->forUser($user)->create();
 
         $this->actingAs($user)

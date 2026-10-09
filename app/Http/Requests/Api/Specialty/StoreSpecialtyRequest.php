@@ -14,9 +14,9 @@ class StoreSpecialtyRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'        => ['required', 'string', 'max:100', 'unique:specialties,name'],
+            'name' => ['required', 'string', 'max:100', 'unique:specialties,name'],
             'description' => ['nullable', 'string', 'max:1000'],
-            'is_active'   => ['boolean'],
+            'is_active' => ['boolean'],
         ];
     }
 }

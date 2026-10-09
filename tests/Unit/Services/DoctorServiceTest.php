@@ -3,7 +3,6 @@
 use App\Enums\UserRole;
 use App\Models\Doctor;
 use App\Models\Specialty;
-use App\Models\User;
 use App\Services\DoctorService;
 
 describe('DoctorService::create', function () {
@@ -12,11 +11,11 @@ describe('DoctorService::create', function () {
         $specialty = Specialty::factory()->create();
 
         $doctor = app(DoctorService::class)->create([
-            'name'          => 'Dr. Ana',
-            'email'         => 'ana@example.com',
-            'password'      => 'Senha@1234',
-            'crm'           => '54321',
-            'crm_uf'        => 'MG',
+            'name' => 'Dr. Ana',
+            'email' => 'ana@example.com',
+            'password' => 'Senha@1234',
+            'crm' => '54321',
+            'crm_uf' => 'MG',
             'specialty_ids' => [$specialty->id],
         ]);
 
@@ -34,11 +33,11 @@ describe('DoctorService::create', function () {
 describe('DoctorService::update', function () {
 
     it('atualiza bio e sincroniza especialidades', function () {
-        $doctor    = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
         $specialty = Specialty::factory()->create();
 
         $updated = app(DoctorService::class)->update($doctor, [
-            'bio'           => 'Especialista em X.',
+            'bio' => 'Especialista em X.',
             'specialty_ids' => [$specialty->id],
         ]);
 
@@ -48,7 +47,7 @@ describe('DoctorService::update', function () {
 
     it('specialty_ids vazio remove todas as especialidades', function () {
         $specialty = Specialty::factory()->create();
-        $doctor    = Doctor::factory()->create();
+        $doctor = Doctor::factory()->create();
         $doctor->specialties()->attach($specialty);
 
         $updated = app(DoctorService::class)->update($doctor, ['specialty_ids' => []]);

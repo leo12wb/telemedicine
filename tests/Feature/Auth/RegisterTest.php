@@ -11,9 +11,9 @@ describe('POST /api/v1/auth/register', function () {
         Event::fake();
 
         $response = $this->postJson('/api/v1/auth/register', [
-            'name'                  => 'João Silva',
-            'email'                 => 'joao@example.com',
-            'password'              => 'senha@1234',
+            'name' => 'João Silva',
+            'email' => 'joao@example.com',
+            'password' => 'senha@1234',
             'password_confirmation' => 'senha@1234',
         ]);
 
@@ -32,9 +32,9 @@ describe('POST /api/v1/auth/register', function () {
         User::factory()->create(['email' => 'existente@example.com']);
 
         $this->postJson('/api/v1/auth/register', [
-            'name'                  => 'Outro',
-            'email'                 => 'existente@example.com',
-            'password'              => 'senha@1234',
+            'name' => 'Outro',
+            'email' => 'existente@example.com',
+            'password' => 'senha@1234',
             'password_confirmation' => 'senha@1234',
         ])->assertStatus(422)
             ->assertJsonPath('errors.email.0', 'Este e-mail já está cadastrado.');
@@ -42,9 +42,9 @@ describe('POST /api/v1/auth/register', function () {
 
     it('rejeita senha fraca', function () {
         $this->postJson('/api/v1/auth/register', [
-            'name'                  => 'João',
-            'email'                 => 'joao@example.com',
-            'password'              => '123',
+            'name' => 'João',
+            'email' => 'joao@example.com',
+            'password' => '123',
             'password_confirmation' => '123',
         ])->assertStatus(422)
             ->assertJsonStructure(['errors' => ['password']]);
@@ -52,9 +52,9 @@ describe('POST /api/v1/auth/register', function () {
 
     it('rejeita confirmação de senha incorreta', function () {
         $this->postJson('/api/v1/auth/register', [
-            'name'                  => 'João',
-            'email'                 => 'joao@example.com',
-            'password'              => 'senha@1234',
+            'name' => 'João',
+            'email' => 'joao@example.com',
+            'password' => 'senha@1234',
             'password_confirmation' => 'outrasenha',
         ])->assertStatus(422)
             ->assertJsonPath('errors.password.0', 'A confirmação de senha não confere.');
@@ -70,9 +70,9 @@ describe('POST /api/v1/auth/register', function () {
         Event::fake();
 
         $this->postJson('/api/v1/auth/register', [
-            'name'                  => 'Teste',
-            'email'                 => 'teste@example.com',
-            'password'              => 'senha@1234',
+            'name' => 'Teste',
+            'email' => 'teste@example.com',
+            'password' => 'senha@1234',
             'password_confirmation' => 'senha@1234',
         ])->assertStatus(201);
 

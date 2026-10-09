@@ -9,11 +9,11 @@ describe('PatientService::create', function () {
 
     it('cria usuário paciente e perfil em transação', function () {
         $patient = app(PatientService::class)->create([
-            'name'            => 'João Paciente',
-            'email'           => 'joao@example.com',
-            'password'        => 'Senha@1234',
-            'birth_date'      => '1985-03-20',
-            'health_insurance'=> 'Unimed',
+            'name' => 'João Paciente',
+            'email' => 'joao@example.com',
+            'password' => 'Senha@1234',
+            'birth_date' => '1985-03-20',
+            'health_insurance' => 'Unimed',
         ]);
 
         expect($patient->user->email)->toBe('joao@example.com')
@@ -38,7 +38,7 @@ describe('PatientService::findOrCreateByUser', function () {
     });
 
     it('retorna perfil existente sem duplicar', function () {
-        $user    = User::factory()->paciente()->create();
+        $user = User::factory()->paciente()->create();
         $existing = Patient::factory()->forUser($user)->create();
 
         $patient = app(PatientService::class)->findOrCreateByUser($user);
@@ -54,7 +54,7 @@ describe('PatientService::update', function () {
         $patient = Patient::factory()->create();
 
         $updated = app(PatientService::class)->update($patient, [
-            'phone'            => '11999998888',
+            'phone' => '11999998888',
             'health_insurance' => 'SulAmérica',
         ]);
 
