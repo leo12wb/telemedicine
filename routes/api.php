@@ -67,8 +67,18 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::delete('/{doctor}', [\App\Http\Controllers\Api\DoctorController::class, 'destroy'])->name('destroy');
         });
 
+        // ─── Pacientes ───────────────────────────────────────────────────────
+        Route::prefix('patients')->name('patients.')->group(function () {
+            Route::get('/profile', [\App\Http\Controllers\Api\PatientController::class, 'profile'])->name('profile');
+            Route::get('/', [\App\Http\Controllers\Api\PatientController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\Api\PatientController::class, 'store'])->name('store');
+            Route::get('/{patient}', [\App\Http\Controllers\Api\PatientController::class, 'show'])->name('show');
+            Route::put('/{patient}', [\App\Http\Controllers\Api\PatientController::class, 'update'])->name('update');
+            Route::delete('/{patient}', [\App\Http\Controllers\Api\PatientController::class, 'destroy'])->name('destroy');
+        });
+
         // Os demais módulos serão adicionados na Fase 5:
-        // - /patients
+        // - /appointments
         // - /patients
         // - /specialties
         // - /appointments

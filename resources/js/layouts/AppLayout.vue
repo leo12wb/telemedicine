@@ -6,6 +6,16 @@
         <RouterLink to="/dashboard" class="text-sm text-gray-600 hover:text-gray-900">Dashboard</RouterLink>
         <RouterLink to="/doctors" class="text-sm text-gray-600 hover:text-gray-900">Médicos</RouterLink>
         <RouterLink
+          v-if="authStore.user?.role === 'admin' || authStore.user?.role === 'medico'"
+          to="/patients"
+          class="text-sm text-gray-600 hover:text-gray-900"
+        >Pacientes</RouterLink>
+        <RouterLink
+          v-if="authStore.user?.role === 'paciente'"
+          to="/patient-profile"
+          class="text-sm text-gray-600 hover:text-gray-900"
+        >Meu perfil clínico</RouterLink>
+        <RouterLink
           v-if="authStore.user?.role === 'admin'"
           to="/users"
           class="text-sm text-gray-600 hover:text-gray-900"

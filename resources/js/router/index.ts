@@ -57,6 +57,18 @@ const router = createRouter({
           component: () => import('@/pages/doctors/DoctorsPage.vue'),
           meta: { requiresAuth: true },
         },
+        {
+          path: 'patients',
+          name: 'patients',
+          component: () => import('@/pages/patients/PatientsPage.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'patient-profile',
+          name: 'patient-profile',
+          component: () => import('@/pages/patients/PatientProfilePage.vue'),
+          meta: { requiresAuth: true },
+        },
       ],
     },
   ],
