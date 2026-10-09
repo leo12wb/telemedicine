@@ -110,7 +110,7 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::patch('/{appointment}/notes', [\App\Http\Controllers\Api\AppointmentController::class, 'updateNotes'])->name('notes');
         });
 
-        // Os demais módulos serão adicionados na Fase 5:
-        // - /dashboard
+        // ─── Dashboard ───────────────────────────────────────────────────────
+        Route::get('/dashboard', [\App\Http\Controllers\Api\DashboardController::class, 'index'])->name('dashboard');
     });
 });
