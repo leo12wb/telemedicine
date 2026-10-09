@@ -61,11 +61,7 @@ async function handleLogin() {
   loading.value = true
   error.value = ''
   try {
-    const { token, user } = await import('@/services/auth').then((m) =>
-      m.authService.login(form.value),
-    )
-    auth.setToken(token)
-    auth.user = user
+    await auth.login(form.value.email, form.value.password)
     router.push('/dashboard')
   } catch (e: unknown) {
     const err = e as { response?: { data?: { message?: string } } }

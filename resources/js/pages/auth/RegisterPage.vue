@@ -64,7 +64,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { authService } from '@/services/auth'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -77,9 +76,7 @@ async function handleRegister() {
   loading.value = true
   error.value = ''
   try {
-    const { token, user } = await authService.register(form.value)
-    auth.setToken(token)
-    auth.user = user
+    await auth.register(form.value.name, form.value.email, form.value.password, form.value.password_confirmation)
     router.push('/dashboard')
   } catch (e: unknown) {
     const err = e as { response?: { data?: { message?: string } } }

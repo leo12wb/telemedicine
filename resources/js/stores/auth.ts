@@ -6,8 +6,10 @@ import { authService } from '@/services/auth'
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
   const token = ref<string | null>(localStorage.getItem('auth_token'))
+  const initialized = ref(false)
 
-  const isAuthenticated = computed(() => !!token.value && !!user.value)
+  // Após init(), isAuthenticated é confiável: user só é definido após validação com o backend
+  const isAuthenticated = computed(() => !!user.value)
 
   function setToken(newToken: string) {
     token.value = newToken
@@ -20,18 +22,44 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('auth_token')
   }
 
-  async function fetchUser() {
-    try {
-      const data = await authService.me()
-      user.value = data
-    } catch {
-      clearAuth()
+  /**
+   * Inicializa o estado de auth ao carregar a aplicação.
+   * Se existir token no localStorage, valida com o backend.
+   * Deve ser chamado antes de montar o router.
+   */
+  async function init() {
+    if (token.value) {
+      try {
+        user.value = await authService.me()
+      } catch {
+        clearAuth()
+      }
     }
+    initialized.value = true
+  }
+
+  async function login(email: string, password: string) {
+    const data = await authService.login({ email, password })
+    setToken(data.token)
+    user.value = data.user
+  }
+
+  async function register(
+    name: string,
+    email: string,
+    password: string,
+    password_confirmation: string,
+  ) {
+    const data = await authService.register({ name, email, password, password_confirmation })
+    setToken(data.token)
+    user.value = data.user
   }
 
   async function logout() {
     try {
       await authService.logout()
+    } catch {
+      // Ignora erro de rede — sessão local é encerrada de qualquer forma
     } finally {
       clearAuth()
     }
@@ -41,9 +69,11 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     token,
     isAuthenticated,
-    setToken,
+    initialized,
+    init,
+    login,
+    register,
     clearAuth,
-    fetchUser,
     logout,
   }
 })

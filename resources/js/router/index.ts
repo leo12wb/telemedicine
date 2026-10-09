@@ -8,6 +8,8 @@ const router = createRouter({
       path: '/',
       redirect: '/dashboard',
     },
+
+    // ─── Rotas públicas (só visitantes) ──────────────────────────────────────
     {
       path: '/login',
       name: 'login',
@@ -20,11 +22,30 @@ const router = createRouter({
       component: () => import('@/pages/auth/RegisterPage.vue'),
       meta: { requiresGuest: true },
     },
+
+    // ─── Rotas protegidas (layout compartilhado) ──────────────────────────────
     {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: () => import('@/pages/DashboardPage.vue'),
+      path: '/',
+      component: () => import('@/layouts/AppLayout.vue'),
       meta: { requiresAuth: true },
+      children: [
+        {
+          path: 'dashboard',
+          name: 'dashboard',
+          component: () => import('@/pages/DashboardPage.vue'),
+        },
+        {
+          path: 'profile',
+          name: 'profile',
+          component: () => import('@/pages/profile/ProfilePage.vue'),
+        },
+        {
+          path: 'users',
+          name: 'users',
+          component: () => import('@/pages/users/UsersPage.vue'),
+          meta: { requiresAdmin: true },
+        },
+      ],
     },
   ],
 })
@@ -37,6 +58,10 @@ router.beforeEach((to) => {
   }
 
   if (to.meta.requiresGuest && auth.isAuthenticated) {
+    return { name: 'dashboard' }
+  }
+
+  if (to.meta.requiresAdmin && auth.user?.role !== 'admin') {
     return { name: 'dashboard' }
   }
 })

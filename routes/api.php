@@ -36,8 +36,17 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::get('/me', [\App\Http\Controllers\Api\Auth\AuthController::class, 'me'])->name('me');
         });
 
+        // ─── Usuários ────────────────────────────────────────────────────
+        Route::prefix('users')->name('users.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\UserController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\Api\UserController::class, 'store'])->name('store');
+            Route::get('/{user}', [\App\Http\Controllers\Api\UserController::class, 'show'])->name('show');
+            Route::put('/{user}', [\App\Http\Controllers\Api\UserController::class, 'update'])->name('update');
+            Route::patch('/{user}/toggle-active', [\App\Http\Controllers\Api\UserController::class, 'toggleActive'])->name('toggle-active');
+            Route::delete('/{user}', [\App\Http\Controllers\Api\UserController::class, 'destroy'])->name('destroy');
+        });
+
         // Os demais módulos serão adicionados na Fase 5:
-        // - /users
         // - /doctors
         // - /patients
         // - /specialties

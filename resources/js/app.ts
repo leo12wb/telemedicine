@@ -3,10 +3,21 @@ import { createPinia } from 'pinia'
 import router from './router'
 import App from './App.vue'
 import '../css/app.css'
+import { useAuthStore } from './stores/auth'
 
-const app = createApp(App)
+async function bootstrap() {
+  const app = createApp(App)
+  const pinia = createPinia()
 
-app.use(createPinia())
-app.use(router)
+  app.use(pinia)
 
-app.mount('#app')
+  // Valida token armazenado antes de montar o router,
+  // evitando redirect indevido para /login no refresh da página.
+  const auth = useAuthStore()
+  await auth.init()
+
+  app.use(router)
+  app.mount('#app')
+}
+
+bootstrap()
