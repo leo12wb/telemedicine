@@ -6,7 +6,9 @@ use App\Enums\UserRole;
 use App\Models\Doctor;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class DoctorService
 {
@@ -99,6 +101,32 @@ class DoctorService
         $doctor->user->update(['is_active' => $doctor->fresh()->is_active]);
 
         return $doctor->fresh(['user', 'specialties']);
+    }
+
+    public function uploadPhoto(Doctor $doctor, UploadedFile $file): Doctor
+    {
+        // Remove foto anterior se existir
+        if ($doctor->photo_path) {
+            Storage::disk('public')->delete($doctor->photo_path);
+        }
+
+        $path = $file->storeAs(
+            "doctors/{$doctor->id}",
+            "photo.{$file->extension()}",
+            'public'
+        );
+
+        $doctor->update(['photo_path' => $path]);
+
+        return $doctor->fresh();
+    }
+
+    public function deletePhoto(Doctor $doctor): void
+    {
+        if ($doctor->photo_path) {
+            Storage::disk('public')->delete($doctor->photo_path);
+            $doctor->update(['photo_path' => null]);
+        }
     }
 
     public function delete(Doctor $doctor): void

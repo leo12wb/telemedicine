@@ -63,4 +63,9 @@ export const appointmentService = {
     const response = await http.patch<{ data: Appointment }>(`/appointments/${id}/notes`, { notes })
     return response.data.data
   },
+
+  async getMeeting(id: string): Promise<{ url: string }> {
+    const response = await http.get<{ data: { url: string } }>(`/appointments/${id}/meeting`)
+    return response.data.data
+  },
 }

@@ -4,6 +4,7 @@ namespace App\Http\Resources\Api;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class DoctorResource extends JsonResource
 {
@@ -15,7 +16,7 @@ class DoctorResource extends JsonResource
             'crm_uf' => $this->crm_uf,
             'phone' => $this->phone,
             'bio' => $this->bio,
-            'photo_path' => $this->photo_path,
+            'photo_url' => $this->photo_path ? Storage::url($this->photo_path) : null,
             'is_active' => $this->is_active,
             'user' => new UserResource($this->whenLoaded('user')),
             'specialties' => SpecialtyResource::collection($this->whenLoaded('specialties')),

@@ -73,6 +73,12 @@
               </span>
             </td>
             <td class="px-6 py-4 text-right text-sm space-x-2">
+              <!-- Entrar na sala de videoconferência -->
+              <button
+                v-if="a.status === 'agendada' || a.status === 'em_andamento'"
+                @click="handleJoinMeeting(a.id)"
+                class="text-indigo-600 hover:underline"
+              >Entrar na consulta</button>
               <!-- Médico: iniciar / encerrar -->
               <button
                 v-if="authStore.user?.role === 'medico' && a.status === 'agendada'"
@@ -220,6 +226,7 @@ import { useDoctorStore } from '@/stores/doctor'
 import { useAuthStore } from '@/stores/auth'
 import type { Appointment } from '@/types/appointment'
 import { STATUS_COLORS } from '@/types/appointment'
+import { appointmentService } from '@/services/appointment'
 
 const store = useAppointmentStore()
 const availStore = useAvailabilityStore()
@@ -331,6 +338,22 @@ async function handleCancel() {
       : (err.response?.data?.message ?? 'Erro ao cancelar.')
   } finally {
     cancelLoading.value = false
+  }
+}
+
+async function handleJoinMeeting(id: string) {
+  try {
+    const { url } = await appointmentService.getMeeting(id)
+    window.open(url, '_blank', 'noopener,noreferrer')
+  } catch (e: unknown) {
+    const err = e as { response?: { data?: { message?: string }; status?: number } }
+    if (err.response?.status === 404) {
+      alert('Videoconferência não disponível para esta consulta.')
+    } else if (err.response?.status === 503) {
+      alert('Serviço de videoconferência temporariamente indisponível.')
+    } else {
+      alert(err.response?.data?.message ?? 'Erro ao obter link da consulta.')
+    }
   }
 }
 

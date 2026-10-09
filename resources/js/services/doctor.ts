@@ -61,4 +61,18 @@ export const doctorService = {
   async remove(id: string): Promise<void> {
     await http.delete(`/doctors/${id}`)
   },
+
+  async uploadPhoto(id: string, file: File): Promise<Doctor> {
+    const form = new FormData()
+    form.append('photo', file)
+    const response = await http.post<{ data: Doctor }>(`/doctors/${id}/photo`, form, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    })
+    return response.data.data
+  },
+
+  async deletePhoto(id: string): Promise<Doctor> {
+    const response = await http.delete<{ data: Doctor }>(`/doctors/${id}/photo`)
+    return response.data.data
+  },
 }

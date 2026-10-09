@@ -5,10 +5,12 @@ namespace App\Providers;
 use App\Models\Doctor;
 use App\Models\Patient;
 use App\Models\Specialty;
+use App\Models\SystemSetting;
 use App\Models\User;
 use App\Policies\DoctorPolicy;
 use App\Policies\PatientPolicy;
 use App\Policies\SpecialtyPolicy;
+use App\Policies\SystemSettingPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 
@@ -19,6 +21,7 @@ class AppServiceProvider extends AuthServiceProvider
         Specialty::class => SpecialtyPolicy::class,
         Doctor::class => DoctorPolicy::class,
         Patient::class => PatientPolicy::class,
+        SystemSetting::class => SystemSettingPolicy::class,
     ];
 
     public function register(): void {}

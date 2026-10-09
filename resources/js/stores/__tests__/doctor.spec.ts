@@ -11,6 +11,8 @@ vi.mock('@/services/doctor', () => ({
     update: vi.fn(),
     toggleActive: vi.fn(),
     remove: vi.fn(),
+    uploadPhoto: vi.fn(),
+    deletePhoto: vi.fn(),
   },
 }))
 
@@ -22,7 +24,7 @@ const makeDoctor = (overrides: Partial<Doctor> = {}): Doctor => ({
   crm_uf: 'SP',
   phone: null,
   bio: null,
-  photo_path: null,
+  photo_url: null,
   is_active: true,
   user: { id: 'user-1', name: 'Dr. João', email: 'joao@x.com', role: 'medico', is_active: true, email_verified_at: null, created_at: '', updated_at: '' },
   specialties: [],

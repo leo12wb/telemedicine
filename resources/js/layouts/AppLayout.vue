@@ -30,6 +30,11 @@
           to="/availability"
           class="text-sm text-gray-600 hover:text-gray-900"
         >Disponibilidade</RouterLink>
+        <RouterLink
+          v-if="authStore.user?.role === 'admin'"
+          to="/settings"
+          class="text-sm text-gray-600 hover:text-gray-900"
+        >Configurações</RouterLink>
       </div>
       <div class="flex items-center gap-4">
         <RouterLink to="/profile" class="text-sm text-gray-600 hover:text-gray-900">

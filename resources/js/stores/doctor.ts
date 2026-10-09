@@ -57,6 +57,22 @@ export const useDoctorStore = defineStore('doctor', () => {
     meta.value.total--
   }
 
+  async function uploadPhoto(id: string, file: File) {
+    const updated = await doctorService.uploadPhoto(id, file)
+    const index = doctors.value.findIndex((d) => d.id === id)
+    if (index !== -1) doctors.value[index] = updated
+    if (currentDoctor.value?.id === id) currentDoctor.value = updated
+    return updated
+  }
+
+  async function deletePhoto(id: string) {
+    const updated = await doctorService.deletePhoto(id)
+    const index = doctors.value.findIndex((d) => d.id === id)
+    if (index !== -1) doctors.value[index] = updated
+    if (currentDoctor.value?.id === id) currentDoctor.value = updated
+    return updated
+  }
+
   return {
     doctors,
     currentDoctor,
@@ -68,5 +84,7 @@ export const useDoctorStore = defineStore('doctor', () => {
     updateDoctor,
     toggleActive,
     removeDoctor,
+    uploadPhoto,
+    deletePhoto,
   }
 })

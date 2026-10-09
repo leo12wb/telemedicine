@@ -5,7 +5,10 @@ use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\AvailabilityController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DoctorController;
+use App\Http\Controllers\Api\DoctorPhotoController;
+use App\Http\Controllers\Api\MeetingController;
 use App\Http\Controllers\Api\PatientController;
+use App\Http\Controllers\Api\SettingsController;
 use App\Http\Controllers\Api\SpecialtyController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
@@ -73,6 +76,8 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::put('/{doctor}', [DoctorController::class, 'update'])->name('update');
             Route::patch('/{doctor}/toggle-active', [DoctorController::class, 'toggleActive'])->name('toggle-active');
             Route::delete('/{doctor}', [DoctorController::class, 'destroy'])->name('destroy');
+            Route::post('/{doctor}/photo', [DoctorPhotoController::class, 'store'])->name('photo.store');
+            Route::delete('/{doctor}/photo', [DoctorPhotoController::class, 'destroy'])->name('photo.destroy');
         });
 
         // ─── Pacientes ───────────────────────────────────────────────────────
@@ -116,6 +121,13 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::patch('/{appointment}/start', [AppointmentController::class, 'start'])->name('start');
             Route::patch('/{appointment}/finish', [AppointmentController::class, 'finish'])->name('finish');
             Route::patch('/{appointment}/notes', [AppointmentController::class, 'updateNotes'])->name('notes');
+            Route::get('/{appointment}/meeting', [MeetingController::class, 'show'])->name('meeting');
+        });
+
+        // ─── Configurações do sistema ────────────────────────────────────────
+        Route::prefix('settings')->name('settings.')->group(function () {
+            Route::get('/', [SettingsController::class, 'index'])->name('index');
+            Route::put('/', [SettingsController::class, 'update'])->name('update');
         });
 
         // ─── Dashboard ───────────────────────────────────────────────────────

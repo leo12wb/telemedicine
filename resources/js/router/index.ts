@@ -87,6 +87,12 @@ const router = createRouter({
           component: () => import('@/pages/availability/AvailabilitySearchPage.vue'),
           meta: { requiresAuth: true },
         },
+        {
+          path: 'settings',
+          name: 'settings',
+          component: () => import('@/pages/settings/SettingsPage.vue'),
+          meta: { requiresAdmin: true },
+        },
       ],
     },
   ],

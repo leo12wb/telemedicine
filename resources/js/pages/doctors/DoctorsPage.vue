@@ -36,6 +36,7 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase w-12">Foto</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">CRM</th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Especialidades</th>
@@ -45,12 +46,24 @@
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr v-if="doctorStore.loading">
-            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Carregando...</td>
+            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Carregando...</td>
           </tr>
           <tr v-else-if="doctorStore.doctors.length === 0">
-            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">Nenhum médico encontrado.</td>
+            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">Nenhum médico encontrado.</td>
           </tr>
           <tr v-for="d in doctorStore.doctors" :key="d.id" class="hover:bg-gray-50">
+            <td class="px-4 py-3">
+              <img
+                v-if="d.photo_url"
+                :src="d.photo_url"
+                :alt="d.user.name"
+                class="w-9 h-9 rounded-full object-cover border border-gray-200"
+              />
+              <div
+                v-else
+                class="w-9 h-9 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-xs"
+              >—</div>
+            </td>
             <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ d.user.name }}</td>
             <td class="px-6 py-4 text-sm text-gray-500">{{ d.crm }}/{{ d.crm_uf }}</td>
             <td class="px-6 py-4 text-sm text-gray-500">
@@ -69,6 +82,7 @@
             </td>
             <td class="px-6 py-4 text-right text-sm space-x-2">
               <RouterLink :to="`/doctors/${d.id}/schedule`" class="text-blue-600 hover:underline">Agenda</RouterLink>
+              <button v-if="authStore.user?.role === 'admin' || (authStore.user?.role === 'medico' && isOwnProfile(d))" @click="openPhoto(d)" class="text-purple-600 hover:underline">Foto</button>
               <button v-if="authStore.user?.role === 'admin'" @click="openEdit(d)" class="text-blue-600 hover:underline">Editar</button>
               <button v-if="authStore.user?.role === 'admin'" @click="handleToggle(d.id)" class="text-yellow-600 hover:underline">
                 {{ d.is_active ? 'Desativar' : 'Ativar' }}
@@ -85,6 +99,46 @@
           <button :disabled="doctorStore.meta.current_page === 1" @click="changePage(doctorStore.meta.current_page - 1)" class="px-3 py-1 text-sm border rounded disabled:opacity-50 hover:bg-gray-50">Anterior</button>
           <span class="px-3 py-1 text-sm">{{ doctorStore.meta.current_page }} / {{ doctorStore.meta.last_page }}</span>
           <button :disabled="doctorStore.meta.current_page === doctorStore.meta.last_page" @click="changePage(doctorStore.meta.current_page + 1)" class="px-3 py-1 text-sm border rounded disabled:opacity-50 hover:bg-gray-50">Próxima</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: foto do médico -->
+    <div v-if="photoTarget" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg p-6 w-full max-w-sm shadow-xl">
+        <h3 class="text-base font-semibold mb-4">Foto do médico</h3>
+        <div class="flex flex-col items-center gap-3 mb-4">
+          <img
+            v-if="photoTarget.photo_url"
+            :src="photoTarget.photo_url"
+            alt="Foto atual"
+            class="w-24 h-24 rounded-full object-cover border border-gray-200"
+          />
+          <div v-else class="w-24 h-24 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-400 text-sm">
+            Sem foto
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nova foto <span class="text-gray-400 font-normal">(JPG, PNG ou WebP, máx. 2 MB)</span></label>
+          <input type="file" accept="image/jpeg,image/png,image/webp" @change="onPhotoFile" class="block w-full text-sm text-gray-500 file:mr-3 file:py-1.5 file:px-3 file:border file:rounded file:text-sm file:bg-gray-50 file:text-gray-700 hover:file:bg-gray-100" />
+        </div>
+        <p v-if="photoError" class="mt-2 text-sm text-red-600">{{ photoError }}</p>
+        <div class="flex justify-between mt-4">
+          <button
+            v-if="photoTarget.photo_url"
+            @click="handleDeletePhoto"
+            :disabled="photoLoading"
+            class="px-3 py-2 text-sm text-red-600 border border-red-200 rounded-md hover:bg-red-50 disabled:opacity-50"
+          >Remover foto</button>
+          <div v-else></div>
+          <div class="flex gap-2">
+            <button @click="photoTarget = null; photoFile = null; photoError = ''" class="px-4 py-2 text-sm border rounded-md hover:bg-gray-50">Fechar</button>
+            <button
+              @click="handleUploadPhoto"
+              :disabled="photoLoading || !photoFile"
+              class="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+            >{{ photoLoading ? 'Enviando...' : 'Enviar' }}</button>
+          </div>
         </div>
       </div>
     </div>
@@ -165,6 +219,60 @@ const showCreateModal = ref(false)
 const editTarget = ref<Doctor | null>(null)
 const formLoading = ref(false)
 const formError = ref('')
+
+// ─── Photo ──────────────────────────────────────────────────────────────────
+const photoTarget = ref<Doctor | null>(null)
+const photoFile = ref<File | null>(null)
+const photoLoading = ref(false)
+const photoError = ref('')
+
+function isOwnProfile(d: Doctor): boolean {
+  return d.user.id === authStore.user?.id
+}
+
+function openPhoto(d: Doctor) {
+  photoTarget.value = d
+  photoFile.value = null
+  photoError.value = ''
+}
+
+function onPhotoFile(e: Event) {
+  const input = e.target as HTMLInputElement
+  photoFile.value = input.files?.[0] ?? null
+}
+
+async function handleUploadPhoto() {
+  if (!photoTarget.value || !photoFile.value) return
+  photoLoading.value = true
+  photoError.value = ''
+  try {
+    const updated = await doctorStore.uploadPhoto(photoTarget.value.id, photoFile.value)
+    photoTarget.value = updated
+    photoFile.value = null
+  } catch (e: unknown) {
+    const err = e as { response?: { data?: { message?: string; errors?: Record<string, string[]> } } }
+    const errors = err.response?.data?.errors
+    photoError.value = errors
+      ? Object.values(errors).flat().join(' ')
+      : (err.response?.data?.message ?? 'Erro ao enviar foto.')
+  } finally {
+    photoLoading.value = false
+  }
+}
+
+async function handleDeletePhoto() {
+  if (!photoTarget.value) return
+  photoLoading.value = true
+  photoError.value = ''
+  try {
+    const updated = await doctorStore.deletePhoto(photoTarget.value.id)
+    photoTarget.value = updated
+  } catch {
+    photoError.value = 'Erro ao remover foto.'
+  } finally {
+    photoLoading.value = false
+  }
+}
 const form = ref({
   name: '', email: '', password: '',
   crm: '', crm_uf: '', phone: '', bio: '',
