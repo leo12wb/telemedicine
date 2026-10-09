@@ -25,6 +25,7 @@
           to="/specialties"
           class="text-sm text-gray-600 hover:text-gray-900"
         >Especialidades</RouterLink>
+        <RouterLink to="/appointments" class="text-sm text-gray-600 hover:text-gray-900">Consultas</RouterLink>
         <RouterLink
           to="/availability"
           class="text-sm text-gray-600 hover:text-gray-900"

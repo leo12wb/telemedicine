@@ -98,9 +98,19 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             });
         });
 
+        // ─── Consultas ───────────────────────────────────────────────────────
+        Route::prefix('appointments')->name('appointments.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Api\AppointmentController::class, 'index'])->name('index');
+            Route::post('/', [\App\Http\Controllers\Api\AppointmentController::class, 'store'])->name('store');
+            Route::get('/{appointment}', [\App\Http\Controllers\Api\AppointmentController::class, 'show'])->name('show');
+            Route::patch('/{appointment}/cancel', [\App\Http\Controllers\Api\AppointmentController::class, 'cancel'])->name('cancel');
+            Route::patch('/{appointment}/reschedule', [\App\Http\Controllers\Api\AppointmentController::class, 'reschedule'])->name('reschedule');
+            Route::patch('/{appointment}/start', [\App\Http\Controllers\Api\AppointmentController::class, 'start'])->name('start');
+            Route::patch('/{appointment}/finish', [\App\Http\Controllers\Api\AppointmentController::class, 'finish'])->name('finish');
+            Route::patch('/{appointment}/notes', [\App\Http\Controllers\Api\AppointmentController::class, 'updateNotes'])->name('notes');
+        });
+
         // Os demais módulos serão adicionados na Fase 5:
-        // - /appointments
-        // - /consultations
         // - /dashboard
     });
 });

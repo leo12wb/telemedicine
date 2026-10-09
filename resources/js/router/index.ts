@@ -70,6 +70,12 @@ const router = createRouter({
           meta: { requiresAuth: true },
         },
         {
+          path: 'appointments',
+          name: 'appointments',
+          component: () => import('@/pages/appointments/AppointmentsPage.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
           path: 'doctors/:doctorId/schedule',
           name: 'doctor-schedule',
           component: () => import('@/pages/availability/DoctorSchedulePage.vue'),

@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\AppointmentStatus;
+use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\DoctorBlock;
 use App\Models\DoctorSchedule;
@@ -151,12 +153,19 @@ class AvailabilityService
             }));
         }
 
-        // 5. TODO: Remover slots com consultas já agendadas (RF-016).
-        // Quando o módulo Appointments for implementado, filtrar aqui por:
-        // Appointment::where('doctor_id', $doctor->id)
-        //     ->whereDate('scheduled_at', $date)
-        //     ->whereIn('status', ['agendada', 'confirmada'])
-        //     ->pluck('time') e remover do array $slots.
+        // 5. Remove slots com consultas já agendadas ou em andamento (RF-016 / RN-012)
+        $bookedTimes = Appointment::where('doctor_id', $doctor->id)
+            ->whereDate('scheduled_date', $date)
+            ->whereNotIn('status', [AppointmentStatus::CANCELADA->value])
+            ->pluck('scheduled_time')
+            ->map(fn ($t) => substr($t, 0, 5)) // normaliza 'HH:MM:SS' → 'HH:MM'
+            ->all();
+
+        if (! empty($bookedTimes)) {
+            $slots = array_values(
+                array_filter($slots, fn ($slot) => ! in_array($slot['time'], $bookedTimes))
+            );
+        }
 
         return $slots;
     }
