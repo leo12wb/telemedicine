@@ -15,7 +15,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Aplica throttle padrão em todas as rotas de API (60 req/min por IP ou usuário)
+        $middleware->api(append: ['throttle:60,1']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Retorna JSON para rotas de API em vez de redirecionar para /login
