@@ -77,10 +77,28 @@ Route::prefix('v1')->name('api.v1.')->group(function () {
             Route::delete('/{patient}', [\App\Http\Controllers\Api\PatientController::class, 'destroy'])->name('destroy');
         });
 
+        // ─── Disponibilidade ─────────────────────────────────────────────────
+        Route::prefix('doctors/{doctor}')->name('doctors.')->group(function () {
+            // Slots disponíveis
+            Route::get('/availability', [\App\Http\Controllers\Api\AvailabilityController::class, 'availability'])->name('availability');
+
+            // Horários recorrentes
+            Route::prefix('schedules')->name('schedules.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Api\AvailabilityController::class, 'indexSchedules'])->name('index');
+                Route::post('/', [\App\Http\Controllers\Api\AvailabilityController::class, 'storeSchedule'])->name('store');
+                Route::put('/{schedule}', [\App\Http\Controllers\Api\AvailabilityController::class, 'updateSchedule'])->name('update');
+                Route::delete('/{schedule}', [\App\Http\Controllers\Api\AvailabilityController::class, 'destroySchedule'])->name('destroy');
+            });
+
+            // Bloqueios de horário
+            Route::prefix('blocks')->name('blocks.')->group(function () {
+                Route::get('/', [\App\Http\Controllers\Api\AvailabilityController::class, 'indexBlocks'])->name('index');
+                Route::post('/', [\App\Http\Controllers\Api\AvailabilityController::class, 'storeBlock'])->name('store');
+                Route::delete('/{block}', [\App\Http\Controllers\Api\AvailabilityController::class, 'destroyBlock'])->name('destroy');
+            });
+        });
+
         // Os demais módulos serão adicionados na Fase 5:
-        // - /appointments
-        // - /patients
-        // - /specialties
         // - /appointments
         // - /consultations
         // - /dashboard

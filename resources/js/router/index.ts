@@ -69,6 +69,18 @@ const router = createRouter({
           component: () => import('@/pages/patients/PatientProfilePage.vue'),
           meta: { requiresAuth: true },
         },
+        {
+          path: 'doctors/:doctorId/schedule',
+          name: 'doctor-schedule',
+          component: () => import('@/pages/availability/DoctorSchedulePage.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'availability',
+          name: 'availability',
+          component: () => import('@/pages/availability/AvailabilitySearchPage.vue'),
+          meta: { requiresAuth: true },
+        },
       ],
     },
   ],

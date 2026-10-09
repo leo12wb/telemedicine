@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Doctor extends Model
@@ -38,6 +39,16 @@ class Doctor extends Model
     public function specialties(): BelongsToMany
     {
         return $this->belongsToMany(Specialty::class, 'doctor_specialty');
+    }
+
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(DoctorSchedule::class);
+    }
+
+    public function blocks(): HasMany
+    {
+        return $this->hasMany(DoctorBlock::class);
     }
 
     public function scopeActive($query)

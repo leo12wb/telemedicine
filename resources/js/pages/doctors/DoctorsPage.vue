@@ -68,11 +68,12 @@
               >{{ d.is_active ? 'Ativo' : 'Inativo' }}</span>
             </td>
             <td class="px-6 py-4 text-right text-sm space-x-2">
-              <button @click="openEdit(d)" class="text-blue-600 hover:underline">Editar</button>
-              <button @click="handleToggle(d.id)" class="text-yellow-600 hover:underline">
+              <RouterLink :to="`/doctors/${d.id}/schedule`" class="text-blue-600 hover:underline">Agenda</RouterLink>
+              <button v-if="authStore.user?.role === 'admin'" @click="openEdit(d)" class="text-blue-600 hover:underline">Editar</button>
+              <button v-if="authStore.user?.role === 'admin'" @click="handleToggle(d.id)" class="text-yellow-600 hover:underline">
                 {{ d.is_active ? 'Desativar' : 'Ativar' }}
               </button>
-              <button @click="handleDelete(d.id)" class="text-red-600 hover:underline">Excluir</button>
+              <button v-if="authStore.user?.role === 'admin'" @click="handleDelete(d.id)" class="text-red-600 hover:underline">Excluir</button>
             </td>
           </tr>
         </tbody>
@@ -152,10 +153,12 @@
 import { ref, onMounted } from 'vue'
 import { useDoctorStore } from '@/stores/doctor'
 import { useSpecialtyStore } from '@/stores/specialty'
+import { useAuthStore } from '@/stores/auth'
 import type { Doctor } from '@/types/doctor'
 
 const doctorStore = useDoctorStore()
 const specialtyStore = useSpecialtyStore()
+const authStore = useAuthStore()
 
 const filters = ref({ search: '', specialty_id: '', page: 1 })
 const showCreateModal = ref(false)

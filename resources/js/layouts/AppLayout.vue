@@ -25,6 +25,10 @@
           to="/specialties"
           class="text-sm text-gray-600 hover:text-gray-900"
         >Especialidades</RouterLink>
+        <RouterLink
+          to="/availability"
+          class="text-sm text-gray-600 hover:text-gray-900"
+        >Disponibilidade</RouterLink>
       </div>
       <div class="flex items-center gap-4">
         <RouterLink to="/profile" class="text-sm text-gray-600 hover:text-gray-900">
