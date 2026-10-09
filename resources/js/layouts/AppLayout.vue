@@ -4,6 +4,7 @@
       <div class="flex items-center gap-6">
         <h1 class="text-lg font-semibold text-gray-900">Telemedicina</h1>
         <RouterLink to="/dashboard" class="text-sm text-gray-600 hover:text-gray-900">Dashboard</RouterLink>
+        <RouterLink to="/doctors" class="text-sm text-gray-600 hover:text-gray-900">Médicos</RouterLink>
         <RouterLink
           v-if="authStore.user?.role === 'admin'"
           to="/users"
