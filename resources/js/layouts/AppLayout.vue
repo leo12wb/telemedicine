@@ -9,6 +9,11 @@
           to="/users"
           class="text-sm text-gray-600 hover:text-gray-900"
         >Usuários</RouterLink>
+        <RouterLink
+          v-if="authStore.user?.role === 'admin'"
+          to="/specialties"
+          class="text-sm text-gray-600 hover:text-gray-900"
+        >Especialidades</RouterLink>
       </div>
       <div class="flex items-center gap-4">
         <RouterLink to="/profile" class="text-sm text-gray-600 hover:text-gray-900">

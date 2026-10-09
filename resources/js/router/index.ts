@@ -45,6 +45,12 @@ const router = createRouter({
           component: () => import('@/pages/users/UsersPage.vue'),
           meta: { requiresAdmin: true },
         },
+        {
+          path: 'specialties',
+          name: 'specialties',
+          component: () => import('@/pages/specialties/SpecialtiesPage.vue'),
+          meta: { requiresAdmin: true },
+        },
       ],
     },
   ],
